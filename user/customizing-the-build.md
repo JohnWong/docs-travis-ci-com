@@ -1,34 +1,32 @@
 ---
-title: Customizing the Build
+title: 定制构建
 layout: en
 permalink: /user/customizing-the-build/
 ---
 
 <div id="toc"></div>
 
-Travis CI provides a default build environment and a default set of steps for each programming language. You can customize any step in this process in `.travis.yml`.  Travis CI uses `.travis.yml` file in the root of your repository to learn about your project and how you want your builds to be executed. `.travis.yml` can be
-very minimalistic or have a lot of customization in it. A few examples of what
-kind of information your `.travis.yml` file may have:
+Travis CI提供了一个默认的构建环境和一个每种编程语言的一系列默认步骤。你可以在 `.travis.yml` 中定制这个过程的任意一步。Travis CI使用你代码库的根目录下的 `.travis.yml` 文件来了解你的项目和你希望如何执行构建。`.travis.yml` 可以非常精简或者有许多定制。你的 `.travis.yml` 文件可能包含的信息类型的例子：
 
-* What programming language your project uses
-* What commands or scripts you want to be executed before each build (for example, to install or clone your project's dependencies)
-* What command is used to run your test suite
-* Emails, Campfire and IRC rooms to notify about build failures
+* 你的项目所使用的编程语言
+* 在你每次构建前你希望执行什么命令或者脚本（例如，安装或者克隆你的项目的依赖）
+* 使用什么命令来运行你的测试套件
+* 提醒你构建失败的电子邮件，Campfire和IRC房间
 
-## The Build Lifecycle
+## 构建的生命周期
 
-A build on Travis CI is made up of two steps:
+Travis CI的一次构建由两步组成：
 
-1. **install**: install any dependencies required
-2. **script**: run the build script
+1. **install**: 安装任何所需的依赖
+2. **script**: 运行构建脚本
 
-You can run custom commands before the installation step (`before_install`), and before (`before_script`) or after (`after_script`) the script step.
+你可以在安装这一步之前运行自定义的脚本（`before_install`），和脚本这一步之前的（`before_script`）或者之后的（`after_script`）。
 
-In a `before_install` step, you can install additional dependencies required by your project such as Ubuntu packages or custom services.
+在`before_install`这一步中，你可以安装你的项目所需的额外的依赖，比如Ubuntu包或者自定义服务。
 
-You can perform additional steps when your build succeeds or fails using  the `after_success` (such as building documentation, or deploying to a custom server) or `after_failure` (such as uploading log files) options. In both `after_failure` and `after_success`, you can access the build result using the `$TRAVIS_TEST_RESULT` environment variable.
+你可以在构建成功或者失败时使用`after_success`（比如构建文档或者部署到自定义的服务器）或者`after_failure`（比如上传日志文件）选项来执行额外的步骤。在 `after_failure` 和 `after_success`，你可以使用环境变量`$TRAVIS_TEST_RESULT`获取构建结果。
 
-The complete build lifecycle, including three optional deployment steps and after checking out the git repository and changing the the repository directory, is:
+完整的构建生命周期，包括了在检查git库和改变库目录后的三个可选的部署步骤，它们是：
 
 1. `before_install`
 2. `install`
@@ -41,66 +39,61 @@ The complete build lifecycle, including three optional deployment steps and afte
 9. OPTIONAL `after_deployment`
 
 
-## Customizing the Installation Step
+## 定制安装步骤
 
-The default dependency installation commands depend on the project language. For instance, Java builds either use Maven or Gradle, depending on which build file is present in the repository. Ruby projects use Bundler when a Gemfile is present in the repository.
+默认的依赖安装命令取决于项目语言。比如Java构建使用Maven或者Gradle，取决于库中存在出哪个构建文件。Ruby项目在库中存在一个Gemfile时使用Bundler。
 
-You can specify your own script to run to install whatever dependencies your project requires in `.travis.yml`:
+你可以指定你自己的脚本来安装 `.travis.yml` 中你的项目所需要的任何依赖：
 
     install: ./install-dependencies.sh
 
-> When using custom scripts they should be executable (for example, using `chmod +x`) and contain a valid shebang line such as `/usr/bin/env sh`, `/usr/bin/env ruby`, or `/usr/bin/env python`. 
+> 当使用自定义脚本时，他们应该是可执行的（比如使用 `chmod +x`）并且包含了有效的一行shebang，比如 `/usr/bin/env sh`，`/usr/bin/env ruby`或者`/usr/bin/env python`。
 
-You can also provide multiple steps, for instance to install both ruby and node dependencies:
+你也可以提供多个步骤，比如同时安装ruby和node依赖：
 
     install:
       - bundle install --path vendor/bundle
       - npm install
 
-When one of the steps fails, the build stops immediately and is marked as [errored](#Breaking-the-Build).
+当其中一步失败了，构建立即停止并标记为[错误](#Breaking-the-Build)。
 
-## Customizing the Build Step
+## 定制构建步骤
 
-The default build command depends on the project language. Ruby projects use `rake`, the common denominator for most Ruby projects.
+默认构建命令依赖于项目语言。Ruby项目使用 `rake`，是大多数Ruby项目的共同特征。
 
-You can overwrite the default build step in `.travis.yml`:
+你可以覆盖 `.travis.yml` 中的默认构建步骤：
 
     script: bundle exec thor build
 
-You can specify multiple script commands as well:
+你也可以指定多个脚本命令：
 
     script:
       - bundle exec rake build
       - bundle exec rake builddoc
 
-When one of the build commands returns a non-zero exit code, the Travis CI build runs the subsequent commands as well, and accumulates the build result.
+当其中一个构建命令返回了一个非零的推出状态码，Travis CI构建也会运行随后的构建命令，并累积构建结果。
 
-In the example above, if `bundle exec rake build` returns an exit code of 1, the following command `bundle exec rake builddoc` is still run, but the build will result in a failure.
+在上面的例子中，如果 `bundle exec rake build` 返回推出状态码1，后面的命令 `bundle exec rake builddoc` 仍然会运行，但是构建的结果将会是失败。
 
-If your first step is to run unit tests, followed by integration tests, you may still want to see if the integration tests succeed when the unit tests fail.
+如果你的第一步是运行单元测试，紧接着是集成测试，你可能仍然希望在单元测试失败的时候仍然看集成测试是否成功。
 
-You can change this behavior by using a little bit of shell magic to run all commands subsequently but still have the build fail when the first command returns a non-zero exit code. Here's the snippet for your `.travis.yml`
+你可以通过使用一点命令行魔法来改变这种行为，运行后续所有命令但是当第一个命令返回非零推出状态码时构建仍然是失败的。这里是 `.travis.yml` 里的代码片段。
 
     script: bundle exec rake build && bundle exec rake builddoc
 
-This example (note the `&&`) fails immediately when `bundle exec rake build` fails.
+这个例子（注意 `&&`）在 `bundle exec rake build` 失败的时候会立即失败。
 
-### Note on $?
+### 注意 $?
 
-Each command in `script` is processed by a special bash function.
-This function manipulates `$?` to produce logs suitable for display.
-Consequently, you should not rely on the value of `$?` in `script` section to
-alter the build behavior.
-See [this GitHub issue](https://github.com/travis-ci/travis-ci/issues/3771)
-for a more technical discussion.
+`script` 中的每个命令都由一个特殊的bash函数处理。这个函数操作 `$?` 来产生适于显示的日志。因此你不应该依赖 `script` 部分的 `$?` 的值来改变构建行为。更多技术讨论参见[这个GitHub issue](https://github.com/travis-ci/travis-ci/issues/3771)。
 
-## Breaking the Build
+## 阻断构建
 
-If any of the commands in the first four stages returns a non-zero exit code, Travis CI considers the build to be broken.
+如果前四步中的任何一个命令返回非零退出状态码，Travis CI会认为构建被阻断。
 
-When any of the steps in the `before_install`, `install` or `before_script` stages fails with a non-zero exit code, the build is marked as **errored**.
+当`before_install`，`install`或者`before_script`阶段中的任何一步失败返回非零退出状态码，构建就会被标记为 **errored**。
 
-When any of the steps in the  `script` stage fails with a non-zero exit code, the build is marked as **failed**.
+当`script`阶段的任何步骤失败返回非零退出状态码，构建会被标记为 **failed**。
 
 > Note that the `script` section has different semantics to the other
 steps. When a step defined in `script` fails, the build doesn't end right away,
