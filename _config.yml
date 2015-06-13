@@ -12,3 +12,4 @@ gems:
   - jekyll-redirect-from
 sass:
   sass_dir: assets/stylesheets
+baseurl: /docs-travis-ci-com
