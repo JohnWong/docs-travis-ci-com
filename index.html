@@ -11,7 +11,7 @@ short_title: true
     <img src="images/ui/docs-desktop.svg" alt="">
   </figure>
   <h1>New around here? Let's get you going.</h1>
-  <p><a class="get-started-button" href="/user/getting-started">Getting Started</a></p>
+  <p><a class="get-started-button" href="{{ "/user/getting-started" | prepend: site.baseurl }}">Getting Started</a></p>
 </section>
 
 <div class="row index-main">
@@ -19,30 +19,30 @@ short_title: true
     <section>
       <h2>Already know the basics?</h2>
       <ul>
-        <li><a href="/user/travis-lint">Validating .travis.yml files</a></li>
-        <li><a href="/user/customizing-the-build">Customizing your build</a></li>
+        <li><a href="{{ "/user/travis-lint" | prepend: site.baseurl }}">Validating .travis.yml files</a></li>
+        <li><a href="{{ "/user/customizing-the-build" | prepend: site.baseurl }}">Customizing your build</a></li>
       </ul>
     </section>
     <section>
       <h2>Deployment Guides</h2>
       <p>Learn how to deploy to your hosting provider using Travis CI.</p>
       <ul>
-        <li><a href="/user/deployment/heroku/">Heroku</a></li>
-        <li><a href="/user/deployment/codedeploy/">AWS CodeDeploy</a></li>
-        <li><a href="/user/deployment/openshift/">OpenShift</a></li>
-        <li><a href="/user/deployment">more deployment guides</a></li>
+        <li><a href="{{ "/user/deployment/heroku/" | prepend: site.baseurl }}">Heroku</a></li>
+        <li><a href="{{ "/user/deployment/codedeploy/" | prepend: site.baseurl }}">AWS CodeDeploy</a></li>
+        <li><a href="{{ "/user/deployment/openshift/" | prepend: site.baseurl }}">OpenShift</a></li>
+        <li><a href="{{ "/user/deployment" | prepend: site.baseurl }}">more deployment guides</a></li>
       </ul>
     </section>
     <section>
       <h2>Common Questions</h2>
       <ul>
-        <li><a href="/user/speeding-up-the-build">How can I make my build faster?</a></li>
-        <li><a href="/user/pull-requests">How are pull requests tested?</a></li>
-        <li><a href="/user/using-postgresql/#Selecting-a-PostgreSQL-Version">How do I choose a PostgreSQL version?</a></li>
-        <li><a href="/user/using-postgresql/#Using-PostGIS">How do I configure PostGIS for my tests?</a></li>
-        <li><a href="/user/pull-requests">How are pull requests tested?</a></li>
-        <li><a href="/user/build-timeouts">My builds are timing out, what can I do?</a></li>
-        <li><a href="/user/repository-providers">What repository providers can I use?</a></li>
+        <li><a href="{{ "/user/speeding-up-the-build" | prepend: site.baseurl }}">How can I make my build faster?</a></li>
+        <li><a href="{{ "/user/pull-requests" | prepend: site.baseurl }}">How are pull requests tested?</a></li>
+        <li><a href="{{ "/user/using-postgresql/#Selecting-a-PostgreSQL-Version" | prepend: site.baseurl }}">How do I choose a PostgreSQL version?</a></li>
+        <li><a href="{{ "/user/using-postgresql/#Using-PostGIS" | prepend: site.baseurl }}">How do I configure PostGIS for my tests?</a></li>
+        <li><a href="{{ "/user/pull-requests" | prepend: site.baseurl }}">How are pull requests tested?</a></li>
+        <li><a href="{{ "/user/build-timeouts" | prepend: site.baseurl }}">My builds are timing out, what can I do?</a></li>
+        <li><a href="{{ "/user/repository-providers" | prepend: site.baseurl }}">What repository providers can I use?</a></li>
       </ul>
     </section>
   </div>
