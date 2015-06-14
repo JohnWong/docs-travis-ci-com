@@ -147,9 +147,9 @@ before_install:
 
 Travis CI使用触发这次构建的git提交所在的分支的 `.travis.yml` 文件。你可以通过使用白名单盒黑名单来告诉Travis构建多个分支。
 
-### Whitelisting or blacklisting branches
+### 白名单或黑名单分支
 
-Specify which branches to build using a whitelist, or blacklist branches that you do not want to be built:
+使用白名单指定哪些分支需要构建，或者你不希望构建的黑名单分支：
 
     # blacklist
     branches:
@@ -163,37 +163,34 @@ Specify which branches to build using a whitelist, or blacklist branches that yo
         - master
         - stable
 
-If you specify both, `only` takes precedence over `except`. By default, `gh-pages` branch are not built unless you add it to the whitelist.
+如果你两者都指定了，`only` 比 `except` 优先级更高。 `gh-pages` 分支默认不构建，除非你将它添加到白名单。
 
-> Note that for historical reasons `.travis.yml` needs to be present *on all active branches* of your project.
+> 注意，由于历史原因， `.travis.yml` 需要出现在你项目的 *所有活跃分支* 中。
 
-### Using regular expressions ###
+### 使用正则表达式
 
-You can use regular expressions to whitelist or blacklist branches:
+你可以使用正则表达式来指定分支的白名单或者黑名单哪：
 
     branches:
       only:
         - master
         - /^deploy-.*$/
 
-Any name surrounded with `/` in the list of branches is treated as a regular expression and can contain any quantifiers, anchors or character classes supported by [Ruby regular expressions](http://www.ruby-doc.org/core-1.9.3/Regexp.html).
+分支列表中任何分支使用 `/` 包围的名称都被当作一个正则表达式，并且可以包含任何量词、锚点或者任何[Ruby正则表达式](http://www.ruby-doc.org/core-1.9.3/Regexp.html)支持的字符类。
 
-Options that are specified after the last `/` (e.g., `i` for case insensitive matching) are not supported but can be given inline instead.  For example, `/^(?i:deploy)-.*$/` matches `Deploy-2014-06-01` and other
-branches and tags that start with `deploy-` in any combination of cases.
+后一个 `/` 之后指定的选项（例如 `i` 表示大小写不敏感匹配）并不支持，但是可以替换为行内给出。例如 `/^(?i:deploy)-.*$/` 匹配 `Deploy-2014-06-01` 和其他以任何大小写组合的 `deploy-` 开始的分支和标签（tag)。 
 
-## Skipping a build
+## 跳过一次构建
 
-If you don't want to run a build for a particular commit, because all you are
-changing is the README for example, add `[ci skip]` to the git commit message. 
+如果不你不希望为某一个特殊的提交运行一次构建，原因是例如你所修改的是README，添加 `[ci skip]` 到提交消息中。
 
-Commits that have `[ci skip]` anywhere in the commit messages are ignored by 
-Travis CI.
+在提交消息任何地方包含 `[ci skip]` 的提交将会被Travis CI忽略。
 
-## Build Matrix
+## 构建矩阵
 
-When you combine the three main configuration options of *Runtime*, *Environment* and *Exclusions/Inclusions* you have a matrix of all possible combinations. 
+当你把 *Runtime*、*Environment* 和 *Exclusions/Inclusions* 这三个主要配置选项组合起来的时候，你会有一个所有可能组合的矩阵。
 
-Below is an example configuration for a build matrix that expands to *56 individual (7 * 4 * 2)* builds.
+下面是一个扩展到 *56个独立（7 * 4 * 2）* 构建矩阵的示例配置。
 
     rvm:
       - 1.8.7
@@ -212,7 +209,7 @@ Below is an example configuration for a build matrix that expands to *56 individ
       - ISOLATED=true
       - ISOLATED=false
 
-You can also define exclusions to the build matrix:
+你可以可以定义构建矩阵的一些排除的组合：
 
     matrix:
       exclude:
@@ -223,12 +220,11 @@ You can also define exclusions to the build matrix:
           gemfile: gemfiles/Gemfile.rails-2.3.x
           env: ISOLATED=true
 
-> Please take into account that Travis CI is an open source service and we rely on worker boxes provided by the community. So please only specify an as big matrix as you *actually need*.
+> 请考虑下Travis CI是一个开源服务，我们依靠社区提供的worker容器。因此请只在你 *确实需要* 的时候指定一个大的矩阵。
 
-### Excluding Builds 
+### 排除构建
 
-If the builds you want to exclude from the matrix share the same matrix
-parameters, you can specify only those and omit the varying parts.
+如果你想要从矩阵中排除的构建拥有相同的矩阵参数，你可以只指定这些并省略变化的部分。
 
 Suppose you have:
 
@@ -249,8 +245,8 @@ gemfile:
 	- gemfiles/rails32.gemfile
 ```
 
-This results in a 3×3×4 build matrix. To exclude all jobs which have `rvm` value `2.0.0` *and*
-`gemfile` value `Gemfile`, you can write:
+这将会导致一个3×3×4的构建矩阵。要排除所有 `rvm` 的值是 `2.0.0` 并且 
+`gemfile` 的值是 `Gemfile` 的工作，你可以这样写：
 
 ```yml
 matrix:
@@ -259,7 +255,7 @@ matrix:
 		gemfile: Gemfile
 ```
 
-Which is equivalent to:
+这也等价于：
 
 ```yml
 matrix:
@@ -275,9 +271,9 @@ matrix:
 		env: DB=mysql
 ```
 
-### Explicity Including Builds
+### 明确包含构建
 
-It is also possible to include entries into the matrix with `matrix.include`:
+也可以使用 `matrix.include` 来为矩阵添加一些条目：
 
     matrix:
       include:
@@ -285,12 +281,11 @@ It is also possible to include entries into the matrix with `matrix.include`:
           gemfile: gemfiles/Gemfile.rails-3.2.x
           env: ISOLATED=false
 
-This adds a particular job to the build matrix which has already been populated.
+这将会给已经形成的构建矩阵增加一个特殊的工作。
 
-This is useful if you want to, only test the latest version of a dependency together with the latest version of the runtime.
+如果你希望只在最新版本的运行时上测试一个依赖的最新版本，那么这将会很有用。
 
-You can use this method to create a job matrix containing only specific combinations. 
-For example,
+你可以使用这种方法来创建一个只包含指定组合的工作矩阵。例如：
 
     language: python
     matrix:
@@ -303,41 +298,34 @@ For example,
           env: TEST_SUITE=suite_pypy
     script: ./test.py $TEST_SUITE
 
-creates a build matrix with 3 jobs, which runs test suite for each version
-of Python.
+创建一个构建矩阵，包含在每个版本的Python上运行测试套件的3个工作。
 
-### Rows that are Allowed To Fail
+### 允许失败的行
 
-You can define rows that are allowed to fail in the build matrix. Allowed
-failures are items in your build matrix that are allowed to fail without causing
-the entire build to fail. This lets you add in experimental and
-preparatory builds to test against versions or configurations that you are not
-ready to officially support.
+你可以在构建矩阵中定义允许失败的行。允许的失败是你的构建矩阵中允许失败但不引起整个构建失败的条目。这使得你可以添加实验中的和预备的构建来测试你并未准备好正式支持的版本或配置。
 
-Define allowed failures in the build matrix as key/value pairs:
+在构建矩阵中使用键值对来定义允许的失败：
 
     matrix:
       allow_failures:
         - rvm: 1.9.3
 
-### Fast finishing
+### 快速完成
 
-If some rows in the build matrix that are allowed to fail, the build won't be marked as finished until they have completed.
+如果构建矩阵中的一些行允许失败，那么直到这些构建矩阵全部完成，构建才会被标记为完成。
 
-To set the build to finish as soon as possible, add `fast_finish: true` to the `matrix` section of your `.travis.yml` like this:
+要设置构建尽快完成，像这样添加 `fast_finish: true` 到你的 `.travis.yml` 的 `matrix` 部分：
 
     matrix:
       fast_finish: true
 
-Now, a build will finish as soon as a job has failed, or when the only jobs left allow failures.
+现在，构建将会在一个工作失败或者剩下的工作都允许失败时完成。
 
+## 实现复杂的构建步骤
 
-## Implementing Complex Build Steps
+如果你有一个难以在 `.travis.yml` 中配置的复杂的构建环境，可以考虑把这些步骤移动到一个分开的shell脚本中。脚本可以使你的代码库中的一部分，可以从 `.travis.yml` 方便地调用。
 
-If you have a complex build environment that is hard to configure in the `.travis.yml`, consider moving the steps into a separate shell script. 
-The script can be a part of your repository and can easily be called from the `.travis.yml`. 
-
-Consider a scenario where you want to run more complex test scenarios, but only for builds that aren't coming from pull requests. A shell script might be:
+考虑一个场景，你想要运行更多复杂的测试场景，但是只针对非来自pull request的构建。一个shell脚本可能是：
 
 ```sh
 #!/bin/bash
@@ -348,29 +336,25 @@ if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then
 fi
 ```
 
-Note the `set -ev` at the top. The `-e` flag causes the script to exit as soon as one command returns a non-zero exit code. This can be handy if you want whatever script you have to exit early. It also helps in complex installation scripts where one failed command wouldn't otherwise cause the installation to fail.
+注意上面的 `set -ev` 。 `-e` 标志会导致脚本在一个命令返回一个非零退出码时尽快退出。如果你希望你的无论什么情况脚本早点退出，那么这将是方便的。如果你的复杂安装脚本符合一个失败的命令并不会引起安装失败，那么这也是有用的。
 
-The `-v` flag makes the shell print all lines in the script before executing them, which helps identify which steps failed.
+`-v` 标记将会使shell在执行它们之前打印所有的行，这将帮助我们辨别哪个步骤失败了。
 
-Assuming the script above is stored as `scripts/run-tests.sh` in your repository, and with the right permissions too (run `chmod ugo+x scripts/run-tests.sh` before checking it in), you can call it from your `.travis.yml`:
+假设上面的脚本存储在你代码库的 `scripts/run-tests.sh` 中，并且也有合适的权限（在检入它之前运行 `chmod ugo+x scripts/run-tests.sh`），你可以在 `.travis.yml` 中调用它：
 
     script: ./scripts/run-tests.sh
 
-### How does this work? (Or, why you should not use `exit` in build steps)
+### 这如何工作？（或者为什么你不应该在构建步骤中使用 `exit` )
 
-The steps specified in the build lifecycle are compiled into a single bash script and executed on the worker.
+在构建生命周期中指定的步骤会被编译进入一个独立的bash脚本，由worker执行。
 
-When overriding these steps, do not use `exit` shell built-in command.
-Doing so will run the risk of terminating the build process without giving Travis a chance to
-perform subsequent tasks.
+当覆盖这些步骤时，不要使用shell的内建命令 `exit`。这么做将会引起不给Travis一个运行后续任务而终止构建流程的风险。
 
-Using `exit` inside a custom script which will be invoked from during a build is fine. 
+在一个构建过程中会被唤起的自定义脚本中使用 `exit` 是允许的。
 
-## Custom Hostnames
+## 自定义主机名
 
-If your build requires setting up custom hostnames, you can specify a single host or a
-list of them in your .travis.yml. Travis CI will automatically setup the
-hostnames in `/etc/hosts` for both IPv4 and IPv6.
+如果你的构建需要设置自定义主机名，你可以在你的 ｀.travis.yml.｀ 中指定一个主机名或者一个主机名列表。Travis CI将会在 `/etc/hosts` 中为IPv4和IPv6自动设置主机名。
 
     addons:
       hosts:
@@ -378,46 +362,42 @@ hostnames in `/etc/hosts` for both IPv4 and IPv6.
         - joshkalderimis.com
 
 
-## Build FAQ
+## 构建问答
 
-### Travis CI Preserves No State Between Builds
+### Travis CI在构建中不保留任何状态
 
-Travis CI uses virtual machine snapshotting to make sure no state is left between builds. If you modify CI environment by writing something to a data store, creating files or installing a package via apt, it won't affect subsequent builds.
+Travis CI使用虚拟主机快照来确保构建之间不会留下任何状态。如果你通过写什么到数据存储，创建文件或者通过apt安装一个包来修改CI环境，这并不会影响接下来的构建。
 
 ### SSH
 
-Travis CI runs all commands over SSH in isolated virtual machines. Commands that modify SSH session state are "sticky" and persist throughout the build.
-For example, if you `cd` into a particular directory, all the following commands will be executed from it. This may be used for good (e.g. building subprojects one
-after another) or affect tools like `rake` or `mvn` that may be looking for files in the current directory.
+Travis CI通过隔离的虚拟机的SSH来运行所有的命令。修改SSH会话状态的命令是“黏”的，并且会在整个构建中保留。例如如果你 `cd` 到一个特殊的目录，接下来所有的命令将会从那里执行。这可能是好的（比如依次构建子工程）或者影响可能在当前目录寻找文件的工具比如 `rake` or `mvn`。
 
-### Git Submodules
+### Git子模块
 
-Travis CI automatically initializes and updates submodules when there's a `.gitmodules` file in the root of the repository.
+在代码库的跟目录下存在 `.gitmodules` 文件时，Travis CI自动初始化并升级子模块。
 
-This can be turned off by setting:
+这可以通过如下设置关闭:
 
     git:
       submodules: false
 
-If your project requires some specific option for your Git submodules which Travis CI does not support out of the box, then you can turn the automatic integration off and use the `before_install` hook to initializes and update them.
+如果你的项目的Git子模块需要一些Travis CI盒子并不支持的特殊选项，你可以关闭自动集成并使用 `before_install` 钩子来初始化或升级它们。
 
-For example:
+例如：
 
     before_install:
       - git submodule update --init --recursive
 
-This will include nested submodules (submodules of submodules), in case there are any.
+如果存在嵌套的子模块（子模块的子模块），那么这将会包含它们。
 
+### 为子模块使用公共网址
 
-### Use Public URLs For Submodules
-
-If your project uses Git submodules, make sure you use public Git URLs. For example, on GitHub, instead of
+如果你的项目使用Git子模块，确保使用公共Git网址。例如在GitHub，将
 
     git@github.com:someuser/somelibrary.git
 
-use
+替换为
 
     git://github.com/someuser/somelibrary.git
 
-Otherwise, Travis CI builders won't be able to clone your project because they don't have your private SSH key.
-
+否则Travis CI构建时无法克隆你的项目，因为它们并没有你的私有SSH key。
