@@ -95,29 +95,27 @@ Travis CI的一次构建由两步组成：
 
 当`script`阶段的任何步骤失败返回非零退出状态码，构建会被标记为 **failed**。
 
-> Note that the `script` section has different semantics to the other
-steps. When a step defined in `script` fails, the build doesn't end right away,
-it continues to run the remaining steps before it fails the build.
+> 注意，`script` 部分与其他步骤相比有不同的语义。当 `script` 中定义的一个步骤失败了，构建并不会立即结束，而是继续执行剩下的步骤直到构建失败。
 
-Currently, neither the `after_success` nor `after_failure` have any influence on the build result. We have plans to change this behaviour.
+目前，`after_success` 或者 `after_failure` 都不会对构建结果有任何影响。我们有计划改变这种行为。
 
-## Deploying your Code
+## 部署你的代码
 
-An optional phase in the build lifecycle is deployment. This step can't be overridden, but is defined by using one of our continuous deployment providers to deploy code to Heroku, Engine Yard, or a different supported platform.
+构建生命周期的一个可选的阶段是部署。这一步并不能被覆盖，而是使用我们的持续部署代码到Heroku，Engine Yard或者其他支持的平台的部署提供者来定义。
 
-You can run steps before a deploy by using the `before_deploy` phase. A non-zero exit code in this command will mark the build as **errored**.
+你可以使用 `before_deploy` 在一次部署前运行一些步骤。这个命令中的非零返回状态码将会把构建标记为 **errored**。
 
-If there are any steps you'd like to run after the deployment, you can use the `after_deploy` phase.
+如果有任何想要在部署之后运行的步骤，你可以使用 `after_deploy` 阶段。
 
-## Specifying Runtime Versions
+## 指定运行时版本
 
-One of the key features of Travis CI is the ease of running your test suite against multiple runtimes and versions. Specify what languages and runtimes to run your test suite against in the `.travis.yml` file:
+Travis CI的一个主要特性是在多个运行时喝版本下运行测试套件的容易性。在 `.travis.yml` 文件中指定使用什么语言和运行时来运行你的测试套件。
 
 {% include languages.html %}
 
-## Installing Packages Using apt
+## 使用apt来安装包
 
-If your dependencies need native libraries to be available, you can use **passwordless sudo to install them**:
+如果你的依赖需要原生库，那么你可以使用 **无密码的sudo来安装他们**：
 
 ```yml
 before_install:
@@ -125,29 +123,29 @@ before_install:
 	- sudo apt-get install -qq [packages list]
 ```
 
-> Note that this feature is not available for builds that are running on [Container-based workers](/user/ci-environment/#Virtualization-environments)
+> 注意，这个特性在运行在[基于容器的Worker](/user/ci-environment/#Virtualization-environments)的构建上不可用。
 
-All virtual machines are snapshotted and returned to their intial state after each build. 
+所有的虚拟机都保存快照，并在每次构建后恢复到其初始状态。
 
-### Using 3rd-party PPAs
+### 使用第三方PPA
 
-If you need a native dependency that is not available from the official Ubuntu repositories, there might be a [3rd-party PPAs](https://launchpad.net/ubuntu/+ppas) that you can use.
+如果你需要的原生库在Ubuntu的官方库里不可用，有一个[第三方PPA](https://launchpad.net/ubuntu/+ppas)可供你使用。
 
-## Build Timeouts
+## 构建超时
 
-Because it is very common for test suites or build scripts to hang, Travis CI has specific time limits for each job. If a script or test suite takes longer than 50 minutes (or 120 minutes on travis-ci.com), or if there is not log output for 10 minutes, it is terminated, and a message is written to the build log.
+由于测试套件或者构建脚本挂起很常见，Travis CI对每个工作都有指定的时间限制。如果一个脚本或者测试套件耗费了超过50分钟的时间（或者在travis-ci.com耗费超过120分钟），或者超过10分钟没有日志输出，它将会被终止，构建日志中会写入一条消息。
 
-Some common reasons why builds might hang:
+一些常见的构建挂起原因：
 
-* Waiting for keyboard input or other kind of human interaction
-* Concurrency issues (deadlocks, livelocks and so on)
-* Installation of native extensions that take very long time to compile
+* 等待键盘输入或者其他类型的人机交互
+* 并发问题（死锁，活锁等）
+* 安装耗费很长时间来编译的原生扩展
 
-> There is no timeout for a build; a build will run as long as all the jobs do as long as each job does not timeout.
+> 构建并没有超时；构建将会执行每一个工作直到这个工作超时。
 
-## Building Specific Branches
+## 构建指定的分支
 
-Travis CI uses the `.travis.yml` file from the branch specified by the git commit that triggers the build. You can tell Travis to build multiple branches suing blacklists or whitelists.
+Travis CI使用触发这次构建的git提交所在的分支的 `.travis.yml` 文件。你可以通过使用白名单盒黑名单来告诉Travis构建多个分支。
 
 ### Whitelisting or blacklisting branches
 
