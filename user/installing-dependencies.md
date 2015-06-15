@@ -1,57 +1,58 @@
 ---
-title: Installing Dependencies
+title: 安装依赖
 layout: en
 permalink: /user/installing-dependencies/
 ---
-Some builds need more than a set of language libraries, they need extra services or libraries not installed by default. To learn about the default setup of our build environment, please refer to The Build Environment.
 
-You have full control over the virtual machine your tests are running on, so you can customize it to your needs.
+一些构建不仅仅需要语言库的一个集合，他们需要默认为安装的额外的服务或者库。想了解我们构建环境的默认设置，请参考构建环境
+
+你可以完全控制你的测试所运行于的虚拟机，因此你可以定制它来满足需求。
 
 <div id="toc"></div>
 
-## Installing Ubuntu packages
+## 安装Ubuntu包
 
-Our Linux environment is currently based on Ubuntu 12.04 LTS. You can install all packages. That are available from its package repository, including security and backports.
+我们的Linux环境当前基于Ubuntu 12.04 LTS。你可以安装所有的包。你可以从它们的包库，包括安全的和移植的。
 
 <div class="note-box">
-Note that this feature is not available for builds that are running on the <a href="/user/workers/container-based-infrastructure">container-based workers</a>, although the
-<a href="/user/apt/">APT</a> addon may be used.
+注意，这个特性在运行于<a href="/user/workers/container-based-infrastructure">基于容器的worker</a>的构建中不可用，尽管
+可以使用<a href="/user/apt/">APT</a>插件。
 </div>
 
-To install Ubuntu packages, add something like the example below to your .travis.yml:
+要使用Ubuntu包，添加一些类似下面例子的东西到你的.travis.yml：
 
     before_install:
       - sudo apt-get update -qq
       - sudo apt-get install -y libxml2-dev
 
-There are two things to note. Before installing a package, make sure to run 'apt-get update'. While we regularly update our build environment to include the latest security patches and updates, new package updates are released regularly, causing our packages indexes to be out of date. Updating the index before installing a Ubuntu package is recommended to avoid breaking your build should the package receive an update.
+有两件事需要注意。在安装一个包之前，确保运行'apt-get update'。我们定期升级我们的构建环境来包含最新的安全补丁和升级，但是新的包定期发布会导致我们的包索引过时。我们建议在安装一个Ubuntu包之前升级来避免由于包需要升级而打破我们的构建。
 
-Second thing to note is the use of the `-y` parameter when running apt-get install. As your build runs without any means for human interaction or intervention, you should make sure that it won't stall with apt-get asking for input. Specifying this flag ensures that it'll do what it'd normally ask your permission for.
+第二件需要注意的事情是当运行apt-get install时`-y`参数的使用。由于你的构建运行时没有人机交互或人工干预，你应该确保不会由于apt-get需要输入而挂起。指定这个标志确保他不会像通常那样向你请求权限。
 
-### A word on apt-get upgrade
+### apt-get upgrade的一句话
 
-We recommend you avoid running apt-get upgrade, as it will upgrade every single package for which apt-get can find a newer version. As we install quite a few packages by default, this could end up downloading and installing up to 500MB of packages.
+我们推荐你不要运行apt-get upgrade，它会升级每个apt-get发现更新版本的包。由于我们默认安装非常少的包，这将会最终下载安装高达500MB的包。
 
-This extends your build time quite significantly, so we generally recommend you avoid using it in your builds.
+这将会显著增加构建时间，因此我们通常建议你不要在你的构建中使用它。
 
-If you need to upgrade a very specific package, you can run a normal 'apt-get install', which will install the latest version available.
+如果你需要升级指定的包，你可以运行一个正常的'apt-get install'，它将会安装最新可用的版本。
 
-## Installing Packages from a custom APT repository
+## 从自定义APT库安装包
 
-For some packages, you may find an existing repository, which isn't yet set up on our build environment by default. You can easily add custom repositories and Launchpad PPAs as part of your build.
+你可能从一个我们构建系统并未默认配置的已经存在的库中找到一些包。你可以很容易地添加自定义库和Launchpad PPA作为你构建的一部分。
 
-Say you require RethinkDB as part of your build. They have an [Launchpad PPA available](http://www.rethinkdb.com/docs/install/ubuntu). You can add this repository to your build by adding the following steps to your .travis.yml:
+假设你需要RethinkDB作为你构建的一部分。有一个[可用的Launchpad PPA](http://www.rethinkdb.com/docs/install/ubuntu)。你可以通过添加如下一些步骤到你的.travis.yml来添加这个库：
 
     before_script:
       - sudo add-apt-repository ppa:rethinkdb/ppa -y
       - sudo apt-get update -q
       - sudo apt-get install rethinkdb
 
-For repositories not hosted on Launchpad, you'll most likely have to add a GnuPG key as part of setting it up.
+对于没有托管在Launchpad的库，你可能不得不将添加GnuPG key作为你配置过程的部分。
 
-If a project runs their own APT repository, like [Varnish](http://varnish-cache.org), you need an extra step of adding the repository's GnuPG key.
+如果一个项目运行在其自己的APT库，比如[Varnish](http://varnish-cache.org)，你需要一个额外的添加库的GnuPG key的步骤。
 
-This example adds the APT repository for Varnish 3.0 for Ubuntu 12.04 to the locally available list of APT sources and then installs the `varnish` package.
+这个例子为Ubuntu 12.04添加了Varnish 3.0的APT库到本地可用的APT资源列表，并安装`varnish`包。
 
     before_script:
       - curl http://repo.varnish-cache.org/debian/GPG-key.txt | sudo apt-key add -
@@ -59,41 +60,41 @@ This example adds the APT repository for Varnish 3.0 for Ubuntu 12.04 to the loc
       - sudo apt-get update -qq
       - sudo apt-get install varnish
 
-## Installing Packages without an APT Repository
+## 不使用APT来安装包
 
-For some projects, there may be a Debian/Ubuntu package available, but no corresponding APT repository. These are still easy to install, but require the extra step of downloading.
+对于一些项目，可能有可用的Debian/Ubuntu包，但是没有匹配的APT库。安装仍然简单，只需要额外的下载步骤。
 
-Say your project requires the pngquant tool to compress PNG files, here's how to download and install the .deb file:
+假设你的项目需要pngquant工具来压缩PNG文件，如下是如何下载并安装.deb文件：
 
     before_install:
       - wget http://pngquant.org/pngquant_1.7.1-1_i386.deb
       - sudo dpkg -i pngquant_1.7.1-1_i386.deb
 
-If you're installing packages this way, make sure they're available for Ubuntu 12.04, our current Linux platform.
+如果你通过这种方式安装包，确保它们在我们当前的Linux平台Ubuntu 12.04下可用。
 
-## Installing Projects from Source
+## 从源代码安装项目
 
-Some dependencies can only be installed from a source package. The build may require a more recent version or a tool or library that's not available as a Ubuntu package.
+一些包可能只能从一个代码包安装。构建可能需要较新的没有可用的Ubuntu包的版本或者工具或者库。
 
-You can easily include the build steps in either your .travis.yml or, and this is the recommended way, by running a script to handle the installation process.
+你可以很容易地把这些构建步骤放到你的.travis.yml或者更加推荐的运行一个脚本来处理安装进程的方式。
 
-Here's a simple example that installs CasperJS from a binary package:
+这里是一个从一个二进制库安装CasperJS的简单的例子：
 
     before_script:
       - wget https://github.com/n1k0/casperjs/archive/1.0.2.tar.gz -O /tmp/casper.tar.gz
       - tar -xvf /tmp/casper.tar.gz
       - export PATH=$PATH:$PWD/casperjs-1.0.2/bin/
 
-Note that when you're updating the `$PATH` environment variable, that part can't be moved into a shell script, as it will only update the variable for the sub-process that's running the script.
+注意，当你要升级`$PATH`，这部分不能移动到一个shell脚本中，因为这样将会只升级运行脚本的子进程的变量。
 
-To install something from source, you can follow similar steps. Here's an example to download, compile and install the protobufs library.
+要从源代码安装一些东西，你可以遵循类似的步骤。这里是一个下载，编译，安装protobufs库的例子。
 
     install:
       - wget https://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
       - tar -xzvf protobuf-2.4.1.tar.gz
       - cd protobuf-2.4.1 && ./configure --prefix=/usr && make && make install
 
-This script lends itself nicely to be extracted into a shell script, let's name it `install-protobuf.sh`:
+这个脚本可以很好地提取到一个shell脚本中，我们将它命名为`install-protobuf.sh`：
 
     #!/bin/sh
     set -ex
@@ -101,23 +102,23 @@ This script lends itself nicely to be extracted into a shell script, let's name 
     tar -xzvf protobuf-2.4.1.tar.gz
     cd protobuf-2.4.1 && ./configure --prefix=/usr && make && sudo make install
 
-Once it's added to the repository, you can run it from your .travis.yml:
+一旦它被添加到库中，你可以从你的.travis.yml运行它：
 
     before_install:
       - ./install-protobuf.sh
 
-## Installing Mac Packages
+## 安装Mac包
 
-On our Mac platform, you have all the developer tools available to install packages from scratch, if you need to.
+在我们的Mac平台上，如果需要，你拥有所有的开发工具来手动下载编译安装包。
 
-First and foremost, you should look at what's available on [Homebrew](http://brew.sh), as it's already preinstalled and ready to use.
+首先你应该在[Homebrew](http://brew.sh)寻找可用的资源，因为它是已经预装随时可以使用的。
 
-Using Homebrew over installing from scratch has several benefits. For a lot of packages, it has binary packages available, removing the need to compile packages when installing them. However, should one of them need to be compiled from source, Homebrew can also manage dependencies and the installation process for you. Using it helps keep your .travis.yml to a minimum.
+使用Homebrew而不是手动下载编译安装有一些好处。对于许多包来说，有可用的二进制包不必在安装时编译它们。即使其中某个包需要从源码编译，Homebrew也可以为你管理依赖和安装进程。使用它有助于保持你的.travis.yml最小化。
 
-Say you need to install beanstalk for your tests, you can use the following set of commands in your .travis.yml:
+假设你需要安装beanstalk来进行你的测试，你可以在你的.travis.yml中使用下面一系列命令：
 
     before_install:
       - brew update
       - brew install beanstalk
 
-Note the addition command `brew update`, which, similar to `apt-get update`, ensures that the local Homebrew installation has the most recent packages in its index.
+注意额外的`brew update`命令，类似于`apt-get update`，来确保本地安装的Homebrew已经有最新包的索引。
