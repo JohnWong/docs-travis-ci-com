@@ -1,32 +1,29 @@
 ---
-title: Uploading Artifacts on Travis CI
+title: 上传工件到Travis CI
 layout: en
 permalink: /user/uploading-artifacts/
 ---
 <div id="toc">
 </div>
 
-Travis CI can automatically upload your build artifacts to S3.
+Travis CI可以自动上传你的构建工件（artifact）到S3。
 
-For a minimal configuration, all you need to do is add the following to your `.travis.yml`:
+最简单的配置，你需要做的只是添加如下内容到你的 `.travis.yml`：
 
     addons:
       artifacts: true
 
-and add the following environment variables in the repository settings:
+并添加下面的环境变量到库设置：
 
     ARTIFACTS_KEY=(AWS access key id)
     ARTIFACTS_SECRET=(AWS secret access key)
     ARTIFACTS_BUCKET=(S3 bucket name)
 
-You can find your AWS Access Keys [here](https://console.aws.amazon.com/iam/home?#security_credential).
+你可以[这里](https://console.aws.amazon.com/iam/home?#security_credential)找到你的AWS访问密钥。
 
-### Deploy specific paths
+### 部署到指定路径
 
-The default paths uploaded to S3 are found via `git ls-files -o` in
-order to find any files in the git working copy that aren't tracked.
-If any additional paths need to be uploaded, they may be specified via
-the `addons.artifacts.paths` key like so:
+上传到S3的默认路径可以通过`git ls-files -o`来找到git工作副本中所有未被追踪的文件。如果有任何需要上传的额外路径，可以像下面这样在 `addons.artifacts.paths` 中指定它们：
 
     addons:
       artifacts:
@@ -36,22 +33,20 @@ the `addons.artifacts.paths` key like so:
         - $(ls /var/log/*.log | tr "\n" ":")
         - $HOME/some/other/thing.log
 
-or as an environment variable in repository settings:
+或者在库设置中作为一个环境变量：
 
     # ':'-delimited paths, e.g.
     ARTIFACTS_PATHS="./logs:./build:/var/log"
 
-### Debugging
+### 调试
 
-If you'd like to see more detail about what the artifacts addon is
-doing, setting `addons.artifacts.debug` to anything non-empty will turn
-on debug logging.
+如果你希望了解工件插件所做事情的更多详情，设置 `addons.artifacts.debug` 为任何非空值可以打开调试日志。
 
     addons:
       artifacts:
         # ...
         debug: true
 
-or define this as a repository settings environment variable, or in the `env.global` section:
+或者将其定义为库设置的环境变量，或者在 `env.global` 部分添加：
 
     ARTIFACTS_DEBUG=1
