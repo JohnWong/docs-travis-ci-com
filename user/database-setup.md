@@ -4,38 +4,36 @@ layout: en
 permalink: /user/database-setup/
 ---
 
-This guide covers setting up the most popular databases and other services in the Travis CI environemnt. Looking for information on [configuring multiple databases?](/user/database-setup/#Multiple-database-systems).
+这份指南涵盖了在Travis CI环境下设置大多数常用数据库和其他服务。希望寻找的信息是[配置多个数据库？](/user/database-setup/#Multiple-database-systems)
 
-The following services are available, all of them use default settings, with the exception of some added users and relaxed security settings:
+下面的服务都可用，它们都使用默认设置，除了一些额外的用户和松懈的安全设置：
 
 {% include databases.html %}
 
-## Starting Services
+## 启动服务
 
-Most services are not started on boot to make more RAM available to test suites, so you need to tell Travis CI to start them
-using the `services` entry in `.travis.yml`:
+大多数服务并不在系统启动时启动，从而给测试套件留出更多RAM，所以你需要使用 `.travis.yml` 中的 `services` 条目来告诉Travis CI来启动他们：
 
     services: mongodb
 
-or to start several services:
+或者启动几个服务：
 
     services:
       - riak      # start riak
       - rabbitmq  # start rabbitmq-server
       - memcached # start memcached
 
-> Note that this feature only works for services we provision in our [CI environment](/user/ci-environment/). If you download Apache Jackrabbit you
-> you still have to start it in a `before_install` step.
+> 注意，这个特性只在我们提供的[CI环境](/user/ci-environment/)下可以提供服务。如果你下载Apache Jackrabbit，你仍然不得不在 `before_install` 步骤中启动它。
 
 ### MySQL
 
-MySQL on Travis CI is **started on boot**, binds to 127.0.0.1 and requires authentication. You can connect using the username "travis" or "root" and a blank password.  
+在Travis CI中，MySQL会在**系统启动时启动**，绑定到127.0.0.1并请求身份验证。你可以使用用户名 “travis”或“root”和空密码来连接。
 
->Note that the "travis" user does not have full MySQL privileges that the "root" user does.
+> 注意，“travis”用户并没有“root”用户所拥有的所有特权。
 
-#### Using MySQL with ActiveRecord
+#### 使用MySQL和ActiveRecord
 
-`config/database.yml` example for Ruby projects using ActiveRecord:
+使用ActiveRecord的Ruby项目的 `config/database.yml` 示例：
 
     test:
       adapter: mysql2
@@ -43,19 +41,17 @@ MySQL on Travis CI is **started on boot**, binds to 127.0.0.1 and requires authe
       username: travis
       encoding: utf8
 
-You might have to create the `myapp_test` database first. Run this as part of your build script:
+你可能需要先创建 `myapp_test` 数据库。将运行它作为你的构建脚本的一部分：
 
     # .travis.yml
     before_script:
       - mysql -e 'create database myapp_test;'
 
-#### Note on `test` database
+#### 注意 `test` 数据库
 
-In older versions of MySQL, Ubuntu package provided the `test` database by default.
-This is no longer the case as of version 5.5.37 due to security concerns
-(See [change log](http://changelogs.ubuntu.com/changelogs/pool/main/m/mysql-5.5/mysql-5.5_5.5.37-0ubuntu0.12.04.1/changelog)).
+在一些老版本的MySQL中，Ubuntu包默认提供了 `test` 数据库。在5.5.37版本处于安全的考虑不再这样做（参见[变更记录](http://changelogs.ubuntu.com/changelogs/pool/main/m/mysql-5.5/mysql-5.5_5.5.37-0ubuntu0.12.04.1/changelog)）。
 
-If you need it, create it using the following `before_install` line:
+如果你需要它，使用下面的 `before_install` 来创建它：
 
 ```yaml
 before_install:
@@ -65,56 +61,56 @@ before_install:
 ### PostgreSQL
 
 
-#### Selecting a PostgreSQL Version
+#### 选择一个PostgreSQL版本
 
-By default, the build environment will have version 9.1 running already.
+默认的构建环境中9.1版本已经在运行。
 
-You can easily choose a different version by way of your .travis.yml.
+你可以很容易地通过你的 .travis.yml 来选择一个不同的版本。
 
-We have PostgreSQL 9.1, 9.2 and 9.3 installed, usually with their latest patch releases. We install them from the official [PostgreSQL APT repository](http://apt.postgresql.org).
+我们安装了PostgreSQL 9.1, 9.2 and 9.3， 通常安装了最新发布的布丁。我们从官方的[PostgreSQL APT库](http://apt.postgresql.org)安装它们。
 
-Currently, you'll find the **following versions installed: 9.1.14, 9.2.9 and 9.3.5**, respectively.
+目前你会发现分别**安装了如下版本：9.1.14, 9.2.9 and 9.3.5**。
 
-To select a different version than the default, use the following setting in your .travis.yml:
+要选择一个非默认的不同版本，在你的 .travis.yml 使用下面的设置：
 
     addons:
       postgresql: "9.3"
 
-This selects PostgreSQL 9.3 as the version your build expects to be running.
+这将会选择PostgreSQL 9.3作为你的构建期望运行的版本。
 
-**Available selections are "9.1", "9.2" and "9.3"**. Make sure to only specify the major and the minor version, without the patch release.
+**可用的选择有“9.1”，“9.2”和“9.3”**。确保只指定主版本号和副版本号，不包括补丁发布。
 
-#### Using PostgreSQL in your Builds
+#### 在你的构建中使用PostgreSQL
 
-The default user for accessing the local PostgreSQL server is `postgres` and doesn't have a password set up.
+本地访问PostgreSQL服务器的默认用户是 `postgres` ，没有设置密码。
 
-Creating a database for your application requires just an extra line in your .travis.yml:
+为你的应用创建一个数据库只需要在你的 .travis.yml 额外添加一行：
 
     before_script:
       - psql -c 'create database travis_ci_test;' -U postgres
 
-For a Rails application, you can now use the following database.yml configuration to access the database locally:
+对于Rails应用，现在你可以使用下面的 database.yml 配置来本地访问数据库：
 
     test:
       adapter: postgresql
       database: travis_ci_test
       username: postgres
 
-Should your local test setup use different credentials or settings to access the local test database, we recommend putting these settings in a database.yml.travis in your repository and copying that over as part of your build:
+如果你的本地测试应该设置不同的认证或者访问本地测试数据的设置，我们推荐你将这些设置放到你的库的 database.yml.travis 中，并将它作为你的构建的一部分：
 
     before_script:
       - cp config/database.yml.travis config/database.yml
 
-#### Using PostGIS
+#### 使用PostGIS
 
-All available versions of PostgreSQL come with PostGIS 2.1 packages preinstalled.
+所有可用的PostgreSQL版本都预装了PostGIS 2.1包。
 
-Your build needs to enable the extension, which isn't done by default. Here's an example for your .travis.yml:
+如果你的构建需要启用扩展，默认并不会开启。下面是你的 .travis.yml 的例子：
 
     before_script:
       - psql -U postgres -c "create extension postgis"
 
-#### PostgreSQL and Locales
+#### PostgreSQL与本地化
 
 The default set of available locales is limited, so depending on your language needs, you may need to install them.
 
