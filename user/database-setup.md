@@ -1,5 +1,5 @@
 ---
-title: Setting up Databases 
+title: 建立服务和数据库 
 layout: en
 permalink: /user/database-setup/
 ---
@@ -12,7 +12,7 @@ permalink: /user/database-setup/
 
 ## 启动服务
 
-大多数服务并不在系统启动时启动，从而给测试套件留出更多RAM，所以你需要使用 `.travis.yml` 中的 `services` 条目来告诉Travis CI来启动他们：
+大多数服务并不在随系统启动，从而给测试套件留出更多RAM，所以你需要使用 `.travis.yml` 中的 `services` 条目来告诉Travis CI来启动他们：
 
     services: mongodb
 
@@ -27,7 +27,7 @@ permalink: /user/database-setup/
 
 ### MySQL
 
-在Travis CI中，MySQL会在**系统启动时启动**，绑定到127.0.0.1并请求身份验证。你可以使用用户名 “travis”或“root”和空密码来连接。
+在Travis CI中，MySQL会在**随系统启动**，绑定到127.0.0.1并请求身份验证。你可以使用用户名 “travis”或“root”和空密码来连接。
 
 > 注意，“travis”用户并没有“root”用户所拥有的所有特权。
 
@@ -110,11 +110,11 @@ before_install:
     before_script:
       - psql -U postgres -c "create extension postgis"
 
-#### PostgreSQL与本地化
+#### PostgreSQL与语言环境
 
-The default set of available locales is limited, so depending on your language needs, you may need to install them.
+默认可用的语言环境有限，因此你可能需要依据你需要的语言来安装它们。
 
-Here are the steps to install the Spanish language pack. Note that you need to remove the PostgreSQL version from the `addons` section of your .travis.yml:
+下面是安装西班牙语言包的步骤。注意，你需要从你的.travis.yml的 `addons` 部分删除PostgreSQL版本。
 
     before_install:
       - sudo apt-get update
@@ -123,11 +123,10 @@ Here are the steps to install the Spanish language pack. Note that you need to r
       - sudo /etc/init.d/postgresql start 9.3
 
 <div class="note-box">
-Note that <code>sudo</code> is not available for builds that are running on the <a href="/user/workers/container-based-infrastructure">container-based workers</a>.
+注意，在<a href="/user/workers/container-based-infrastructure">基于容器的worker</a>中运行构建时<code>sudo</code>不可用。
 </div>
 
-
-Here's a list of locales currently installed on the system by default:
+下面是当前默认安装在系统中的语言环境列表：
 
     C
     C.UTF-8
@@ -154,21 +153,15 @@ Here's a list of locales currently installed on the system by default:
     en_ZW.utf8
     POSIX
 
-All language packs currently available for Ubuntu 12.04 can be [found on the packages site.](http://packages.ubuntu.com/search?keywords=language-pack&searchon=names&suite=precise&section=all)
-
-
-
-
-
+目前Ubuntu 12.04中可用的所有的语言包可以从[包网站](http://packages.ubuntu.com/search?keywords=language-pack&searchon=names&suite=precise&section=all)找到。
 
 ### SQLite3
 
-Probably the easiest and simplest solution for your relation database needs. If you don't specifically want to test how your code behaves with other databases,
-in memory SQLite might be the best option.
+可能是你的关系数据库需求的最容易最简单的解决方案。如果你并不明确地希望测试你的代码在其他数据库的行为，内存SQLite可能是最好的选择。
 
-#### SQLite3 in Ruby Projects
+#### Ruby工程中的SQLite3
 
-For Ruby projects, ensure that you have the sqlite3 ruby bindings in your bundle:
+对于Ruby工程来说，确保你的bundle中Sqlite3的ruby绑定：
 
     # Gemfile
     # for CRuby, Rubinius, including Windows and RubyInstaller
@@ -177,41 +170,38 @@ For Ruby projects, ensure that you have the sqlite3 ruby bindings in your bundle
     # for JRuby
     gem "jdbc-sqlite3", :platform => :jruby
 
-`config/database.yml` example for projects that use ActiveRecord:
+项目使用ActiveRecord的 `config/database.yml` 的示例：
 
     test:
       adapter: sqlite3
       database: ":memory:"
       timeout: 500
 
-If you're not using a `config/database.yml` file to configure ActiveRecord, you need to connect to the database manually in the tests. For example, connecting with ActiveRecord could be done like this:
+如果你不在使用一个 `config/database.yml` 文件来配置ActiveRecord，你需要在测试中手动连接数据库。例如可以通过如下方法链接ActiveRecord：
 
     ActiveRecord::Base.establish_connection :adapter => 'sqlite3',
                                             :database => ':memory:'
 
 ### MongoDB
 
-MongoDB is **not started on boot**. Add it to `.travis.yml` to start it:
+MongoDB**不随系统启动**。添加如下内容到 `.travis.yml` 来启动它。
 
     services:
       - mongodb
 
-MongoDB binds to 127.0.0.1 and requires no authentication or database creation up front. If you add an admin user, authentication will be enabled, since `mongod` is started with the `--auth` argument.
+MongoDB绑定到127.0.0.1，不需要身份验证或者预先创建数据库。如果你添加了一个admin用户，将会启用身份验证，因为 `mongod` 是随着参数 `--auth` 启动的。
 
-> Note: Admin users are users created on the admin database.
+> 注意：admin用户是在admin数据库创建的用户。
 
-To create users for your database, add a `before_script` to your `.travis.yml` file:
+要在你的数据库创建用户，添加 `before_script` 到你的 `.travis.yml` 文件：
 
     # .travis.yml
     before_script:
       - mongo mydb_test --eval 'db.addUser("travis", "test");'
 
-#### MongoDB may not be immediately accepting connections
+#### MongoDB可能不会立即接受连接
 
-A few users have reported that MongoDB may not be accepting connections when the job attempts to
-execute commands.
-The issue is intermittent at best, and the only reliable means to avoid it is to
-inject artificial wait before making the first connection:
+一些用户反馈在工作尝试执行命令时，MongoDB可能不会接受连接。这个问题是间歇性的，唯一可靠的避免方法是在第一次连接前插入人工等待：
 
     # .travis.yml
     before_script:
@@ -220,72 +210,68 @@ inject artificial wait before making the first connection:
 
 ### CouchDB
 
-CouchDB is **not started on boot**. Add it to `.travis.yml` to start it:
+CouchDB **不随系统启动**。添加如下内容到 `.travis.yml` 来启动它：
 
     services:
       - couchdb
 
-CouchDB binds to 127.0.0.1, uses stock configuration and does not require authentication (in CouchDB speak it runs in admin party).
+CouchDB绑定到127.0.0.1，使用stock配置，不需要身份验证（在CouchDB文档中，它运行在admin组）。
 
-You have to create the database as part of your build process:
+你不得不将创建数据库作为你构建进程的一部分：
 
     # .travis.yml
     before_script:
       - curl -X PUT localhost:5984/myapp_test
 
-
 ### RabbitMQ
 
-RabbitMQ is **not started on boot**. Add it to `.travis.yml` to start it:
+RabbitMQ**不随系统启动**。添加如下内容到`.travis.yml`来启动它：
 
     services:
       - rabbitmq
 
-RabbitMQ uses the default configuration of vhost (`/`), username (`guest`) and password (`guest`). 
-You can set up more vhosts and roles via a `before_script` if needed (for example, to test authentication).
-
+RabbitMQ使用默认配置的vhost（`/`），用户名（`guest`）和密码（`guest`）。如果需要，你可以使用 `before_script` 设置更多的vhost和角色（例如测试身份验证）。
 
 ### Riak
 
-Riak is **not started on boot**. Add it to `.travis.yml` to start it:
+Riak**不随系统启动**。添加如下内容到 `.travis.yml` 来启动它：
 
     services:
       - riak
 
-Riak uses stock configuration with one exception: it is configured to use [LevelDB storage backend](http://docs.basho.com/riak/latest/ops/advanced/backends/leveldb/).
-Riak Search is enabled.
+Riak使用stock配置，除了一个例外：配置为使用[LevelDB存储后端](http://docs.basho.com/riak/latest/ops/advanced/backends/leveldb/)。Riak搜索时启用的。
 
 ### Memcached
 
-Memcached is **not started on boot**. Add it to `.travis.yml` to start it:
+Memcached**不随系统启动**。添加如下内容到`.travis.yml`来启动它：
 
     services:
       - memcached
 
-Memcached uses stock configuration and binds to localhost.
+Memcached使用stock配置，绑定到localhost。
 
 ### Redis
 
-Redis is **not started on boot**. Add it to `.travis.yml` to start it:
+Redis**不随系统启动**。添加如下内容到 `.travis.yml` 来启动它：
 
     services:
       - redis-server
 
-Redis uses stock configuration and is available on localhost.
+Redis使用stock配置，可以在localhost上使用。
 
 
 ### Cassandra
 
-Cassandra is **not started on boot**. Add it to `.travis.yml` to start it:
+Cassandra**不随系统启动**。添加如下内容到`.travis.yml`来启动它：
 
     services:
       - cassandra
 
-Cassandra is provided via [Datastax Community Edition](http://www.datastax.com/products/community) and uses stock configuration (available on 127.0.0.1).
+Cassandra由[Datastax社区版](http://www.datastax.com/products/community)提供，使用stock配置可以在127.0.0.1使用。
 
-#### Older version
+#### 老版本
 
-If you need an older version of Cassandra, you can add a command like the following to your `.travis.yml`:
+如果你需要一个老版本的Cassandra，你可以添加类似如下内容的命令到你的 `.travis.yml`：
 
 ```yaml
 before_install:
@@ -293,75 +279,72 @@ before_install:
   - wget http://www.us.apache.org/dist/cassandra/1.2.18/apache-cassandra-1.2.18-bin.tar.gz && tar -xvzf apache-cassandra-1.2.18-bin.tar.gz && sudo sh apache-cassandra-1.2.18/bin/cassandra
 ```
 
-> `sudo` is not available on [Container-based workers](/user/ci-environment/#Virtualization-environments).
+> `sudo` 在[基于容器的worker](/user/ci-environment/#Virtualization-environments)下不可用。
 
 ### Neo4J
 
-Neo4J Server (Community Edition) is **not started on boot**. Add it to `.travis.yml` to start it:
+Neo4J服务器（社区版）**不随系统启动**。添加如下内容到`.travis.yml`来启动它：
 
     services:
       - neo4j
 
-Neo4J Server uses default configuration (localhost, port 7474).
+Neo4J服务器使用默认的配置（localhost，7474端口）。
 
-> Neo4j does not start on container-based workers. See <a href="https://github.com/travis-ci/travis-ci/issues/3243">https://github.com/travis-ci/travis-ci/issues/3243</a>
+> Neo4j无法在基于容器的worker启动。参见[https://github.com/travis-ci/travis-ci/issues/3243](https://github.com/travis-ci/travis-ci/issues/3243)
 
 ### ElasticSearch
 
-ElasticSearch is **not started on boot**. Add it to `.travis.yml` to start it:
+ElasticSearch**不随系统启动**。添加如下内容到`.travis.yml`来启动它：
 
     services:
       - elasticsearch
 
-ElasticSearch may take few seconds to start and may not be available when the script is executed. In that case, we can make Travis CI wait with the ``sleep`` command
+ElasticSearch可能需要花费几秒钟来启动，可能在脚本执行后不可用。 在这种情况下，我们可以使用 ``sleep`` 命令让Travis CI等待：
 
     before_script:
       - sleep 10
 
-ElasticSearch is provided via official Debian packages and uses stock configuration (available on 127.0.0.1).
+ElasticSearch由官方Debian包提供，使用stock配置（在127.0.0.1可用）。
 
-#### Using a specific version of ElasticSearch
+#### 使用指定版本的ElasticSearch
 
-You can overwrite the installed ElasticSearch with the version you need (e.g., 1.2.4) with the following:
+你可以用如下方法用你需要的版本（比如1.2.4）覆盖已安装的ElasticSearch：
 
 ```yaml
 before_install:
   - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.2.4.deb && sudo dpkg -i --force-confnew elasticsearch-1.2.4.deb
 ```
-> `sudo` is not available on [Container-based workers](/user/ci-environment/#Virtualization-environments).
+> `sudo` 在[基于容器的worker](/user/ci-environment/#Virtualization-environments)下不可用。
 
-#### Garbled Output
+#### 混乱的输出
 
-When ElasticSearch starts, you may see a mangled message such as this:
+当ElasticSearch启动时，你可能看到像下面这样损坏的消息：
 
 ```
 $ sudo service elasticsearch start
  * Starting ElasticSearch Server       ission denied on key 'vm.max_map_count'
 ```
 
-This is due to a [recent change in ElasticSearch](https://github.com/elasticsearch/elasticsearch/issues/4397),
-as reported [here](https://github.com/elasticsearch/elasticsearch/issues/4978).
-The message is harmless, and the service is functional.
+这是由于[ElasticSearch最近的变更](https://github.com/elasticsearch/elasticsearch/issues/4397)，报告在[这里](https://github.com/elasticsearch/elasticsearch/issues/4978)。信息是无害的，服务功能正常。
 
-### Multiple database systems
+### 多数据库系统
 
-If your project's tests need to run multiple times using different databases, this can be configured on Travis CI using a technique
-with env variables. The technique is just a convention and requires a `before_script` or `before_install` line to work.
+如果你项目的测试需要使用不同的数据库运行多次，可以在Travis CI上使用一个env变量技术来配置。这个技术只是一个惯例，需要 `before_script` 或者 `before_install` 来生效。
 
-#### Using ENV variables and before_script steps
+#### 在before_script步骤使用ENV变量
 
-Use the `DB` environment variable to specify the name of the database configuration. Locally you would run:
+使用`DB`环境变量来制定数据库配置的名称。在本地运行：
 
     $ DB=postgres [commands to run your tests]
 
-On Travis CI you want to create a [build matrix](/user/customizing-the-build/#Build-Matrix) of three builds each having the `DB` variable exported with a different value, and for that you can use the `env` option in `.travis.yml`:
+在Travis CI你需要创建一个包含三个构建的[构建矩阵](/user/customizing-the-build/#Build-Matrix)，每个都有导出为不同值的`DB`变量，你可以在 `.travis.yml` 使用  `env` 选项：
 
     env:
       - DB=sqlite
       - DB=mysql
       - DB=postgres
 
-Then you can use those values in a `before_install` (or `before_script`) step to set up each database. For example:
+然后你可以在`before_install`（或`before_script`）步骤使用这些值来设置每个数据库。例如：
 
     before_script:
       - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'DROP DATABASE IF EXISTS doctrine_tests;' -U postgres; fi"
@@ -371,14 +354,13 @@ Then you can use those values in a `before_install` (or `before_script`) step to
       - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database IF NOT EXISTS doctrine_tests_tmp;create database IF NOT EXISTS doctrine_tests;'; fi"
 
 
-> Travis CI does not have any special support for these variables, it just creates three builds with different exported values. It is up to your
-test suite or `before_install`/`before_script` steps to make use of them.
+> Travis CI对这些变量并没有任何特殊的支持，它只是创建了有不同导出值的三个构建。这取决于你的测试套件或者`before_install`/`before_script`步骤来利用它们。
 
-For a real example, see [doctrine/doctrine2 .travis.yml](https://github.com/doctrine/doctrine2/blob/master/.travis.yml).
+实际例子可以参考[doctrine/doctrine2 .travis.yml](https://github.com/doctrine/doctrine2/blob/master/.travis.yml)。
 
-#### A Ruby-specific Approach
+#### 一个Ruby特定的方法
 
-Another approach that is Ruby-specific is put all database configurations in one YAML file (`test/database.yml` for example), like ActiveRecord does:
+另一个Ruby特定的方法是将你所有的数据库配置放到一个YAML文件（例如`test/database.yml`），比如ActiveRecord是：
 
     sqlite:
       adapter: sqlite3
@@ -394,7 +376,7 @@ Another approach that is Ruby-specific is put all database configurations in one
       database: myapp_test
       username: postgres
 
-Then, in your test suite, read that data into a configurations hash:
+接下来在你的测试套件中读取数据到一个配置hash:
 
     configs = YAML.load_file('test/database.yml')
     ActiveRecord::Base.configurations = configs
