@@ -1,85 +1,75 @@
 ---
-title: Encryption keys
+title: 加密密钥
 layout: en
 permalink: /user/encryption-keys/
 ---
 
-**We have separate documentation on [encrypting files](/user/encrypting-files/).**
+**我们有独立的[加密文件](/user/encrypting-files/)的文档。**
 
-Travis CI generates a pair of private and public RSA keys which can be used
-to encrypt information which you will want to put into the `.travis.yml` file and
-still keep it private. Currently we allow encryption of
-[environment variables](/user/environment-variables/), notification settings, and deploy api keys.
+Travis CI生成一组公有和私有RSA密钥，可以用来加密你放在`.travis.yml`文件中的信息，并仍然保持私有。目前我们允许加密[环境变量](/user/environment-variables/)，通知设置和部署api密钥。
 
-**Please note that encrypted environment variables are not available for [pull requests from forks](/user/pull-requests#Security-Restrictions-when-testing-Pull-Requests).**
+**请注意加密的环境变量在[来自fork的pull request](/user/pull-requests#Security-Restrictions-when-testing-Pull-Requests)中不可用**
 
-## Usage
+## 使用
 
-The easiest way to encrypt something with the public key is to use Travis CLI.
-This tool is written in Ruby and published as a gem. First, you need to install
-the gem:
+用公用密钥加密的最简单的方法是使用Travis CLI。这个工具使用Ruby编写并作为gem发布。首先你需要安装这个gem：
 
     gem install travis
 
-Then, you can use `encrypt` command to encrypt data (This example assumes you are running the command in your project directory. If not, add `-r owner/project`):
+然后你可以使用`encrypt`命令来加密数据（这个例子假设你在你的项目目录运行命令。如果不是，添加`-r owner/project`）。
 
     travis encrypt SOMEVAR=secretvalue
 
-This will output a string looking something like:
+这将会输出一个字符串，看起来类似：
 
     secure: ".... encrypted data ...."
 
-Now you can place it in the `.travis.yml` file.
+现在你可以将它放在`.travis.yml`文件中。
 
-Please note that the name of the environment variable and its value are both encoded in the string produced by "travis encrypt." You must add the entry to your .travis.yml with key "secure" (underneath the "env" key). This makes the environment variable SOMEVAR with value "secretvalue" available to your program.
+请注意环境变量的名称和值都编码为"travis encrypt."所产生的字符串。你必须添加这一条到"secure"键（在"env"键下面）中。这使得值为"secretvalue"的环境变量SOMEVAR在你的程序中可用。
 
-You may add multiple entries to your .travis.yml with key "secure." They will all be available to your program.
+你可能添加多条到你的.travis.yml的"secure."键中。它们在你的程序中都可用。
 
-Encrypted values can be used in
-[secure environment variables in the build matrix](/user/environment-variables#In-the-.travis.yml)
-and [notifications](/user/notifications).
+加密值可以在[构建矩阵的安全环境变量](/user/environment-variables#In-the-.travis.yml)与[通知](/user/notifications)中使用。
 
-### Note on escaping certain symbols
+### 注意转义某些符号
 
-When you use `travis encrypt` to encrypt sensitive data, it is important to note that it will
-be processed as a `bash` statement.
-This means that secret you are encrypting should not cause errors when `bash` parses it.
-Having incomplete data will cause `bash` to dump the error statement to the log, which
-contains portions of your sensitive data.
+当你使用`travis encrypt`来加密敏感数据，注意它将会作为一个`bash`语句处理是重要的。这意味着你在加密的秘密在`bash`解析它时不应该引起错误。
 
-Thus, you need to escape symbols such as braces, parentheses, backslashes, and pipe symbols.
-For example, when you want to assign the string `6&a(5!1Ab\` to `FOO`, you need to execute:
+数据不完整会引起`bash`产生错误语句到日志中，包含你的敏感数据的一部分。
+
+因此你需要转义符号，比如括号、反斜杠与竖杠符号。例如当你希望为`FOO`赋值字符串`6&a(5!1Ab\`，你需要执行：
 
     travis encrypt "FOO=6\\&a\\(5\\!1Ab\\\\"
 
-`travis` encrypts the string `FOO=6\&a\(5\!1Ab\\`, which then `bash` uses to evaluate in the build environment.
+`travis`加密字符串`FOO=6\&a\(5\!1Ab\\`然后`bash`在构建环境中使用来评估。
 
-Equivalently, you can do
+相当于你可以做
 
     travis encrypt 'FOO=6\&a\(5\!1AB\\'
 
-### Notifications Example
+### 通知示例
 
-We want to add campfire notifications to our .travis.yml file, but we don't want to publicly expose our API token.
+我们希望添加campfire通知到我们的.travis.yml文件，但是我们并不希望公开暴露我们的API token。
 
-The entry should be in this format:
+条目应该是这样的格式：
 
     notifications:
       campfire: [subdomain]:[api token]@[room id]
 
-For us, that is somedomain:abcxyz@14.
+对于我们，那是somedomain:abcxyz@14。
 
-We encrypt this string
+我们加密这个字符串
 
     travis encrypt somedomain:abcxyz@14
 
-Which produces something like this
+就会产生一些像这样的东西
 
     Please add the following to your .travis.yml file:
 
       secure: "ABC5OwLpwB7L6Ca...."
 
-We add to our .travis.yml file
+我们添加到我们的.travis.yml文件中
 
     notifications:
       campfire:
@@ -88,58 +78,57 @@ We add to our .travis.yml file
 
 And we're done.
 
-### Detailed Discussion
+### 详细讨论
 
-The secure var system takes values of the form ```{ 'secure' => 'encrypted string' }``` in the (parsed YAML) configuration and replaces it with the decrypted string.
+安全变量系统从（解析的YAML）配置中获取```{ 'secure' => 'encrypted string' }```形式的值病将其替换为机密后的字符串。
 
-So
+因此
 
     notifications:
       campfire:
         rooms:
           secure: "encrypted string"
 
-becomes
+变成
 
     notifications:
       campfire:
         rooms: "decrypted string"
 
-while
+而
 
     notifications:
       campfire:
         rooms:
           - secure: "encrypted string"
 
-becomes
+变成
 
     notifications:
       campfire:
         rooms:
           - "decrypted string"
 
-In the case of secure env vars
+在安全环境变量的情况下
 
     env:
       - secure: "encrypted string"
 
-becomes
+变成
 
     env:
       - "decrypted string"
 
-## Fetching the public key for your repository
+## 获取你的库的公共密钥
 
-You can fetch the public key with Travis API, using `/repos/:owner/:name/key` or
-`/repos/:id/key` endpoints, for example:
+你可以使用Travis API获取公共密钥，使用`/repos/:owner/:name/key`或者`/repos/:id/key` endpoints，例如：
 
     https://api.travis-ci.org/repos/travis-ci/travis-ci/key
 
-You can also use the `travis` tool for retrieving said key:
+你也可以使用`travis`工具来获取上述密钥：
 
     travis pubkey
 
-Or, if you're not in your project directory:
+或者如果你不在你项目的目录下：
 
     travis pubkey -r owner/project

@@ -1,36 +1,30 @@
 ---
-title: Testing Your Project on Multiple Operating Systems
+title: 在多操作系统上测试你的项目
 layout: en
 permalink: /user/multi-os/
 ---
 
-## We are not currently accepting multi-OS requests
-We are at capacity with Mac workers in both .org and .com
-environments.
-Consequently, we are not accepting requests for the multi-OS
-feature at this time.
-As more capacity is added, we will resume accepting requests.
+## 我们目前不接受多操作系统的请求
 
-### This is a beta feature
-The feature described in this document is considered beta.
-Some features may not work as described.
+我们当前精力投入在.org和.com环境中的Mac worker的能力上。因此我们此时无法接受多操作系统的请求。当添加了大多数能力后，我们将会继续接受请求。
 
-### Manual intervention required
-This feature needs to be enabled manually.
-If you wish to take advantage of this feature, please send
-email to support@travis-ci.com, indicating which repository
-you would like to have it enabled.
+### 这是一个beta特性
 
-## Introduction
-If your code is intended to be used on multiple operating systems
-(e.g., a Ruby gem, a Python library, a JVM application),
-you can benefit from testing on intended targets.
+这份文档中描述的特性是beta版的。一些特性可能并不会像描述的那样工作。
 
-Travis CI can help by offering testing on Linux and OS X.
+### 人工介入是必要的
 
-## Setting `.travis.yml`
-In the repository for which the multi-OS feature is enabled,
-add the following:
+这个特性需要人工启用。如果你希望利用这个特性，请发送电子邮件到support@travis-ci.com，指明你希望启用的库。
+
+## 简介
+
+如果你的代码打算在多个操作系统上使用（例如Ruby gem，Python库，Java虚拟机程序），你从测试既定目标中受益。
+
+Travis CI通过提供在Linux与OS X的测试来提供帮助。
+
+## 设置`.travis.yml`
+
+在启用多操作系统特性的库中添加如下内容：
 
 ```yaml
 os:
@@ -38,44 +32,35 @@ os:
   - osx
 ```
 
-## `TRAVIS_OS_NAME` environment variable
-To distinguish the jobs, you can use `$TRAVIS_OS_NAME`.
-The value corresponds to the `os` value in `.travis.yml`,
-either `linux` or `osx`.
+## `TRAVIS_OS_NAME`环境变量
 
-## Operating System differences
-When you test your code on multiple operating systems, always be mindful of differences
-that can affect your tests.
+要区分工作，你可以使用 `$TRAVIS_OS_NAME`。其值符合`.travis.yml`中的`os`值，是`linux`或`osx`。
 
-1. Not all tools may be available on the Mac
+## 操作系统差异
 
-	We are still working on building up the tool chain on the Mac worker.
-	Missing pieces of software [may be available](http://braumeister.org/) via Homebrew.
+当你在多个操作系统上测试你的代码，谨记差异会影响你的测试。
 
-1. The file system behavior is different
+1. 并不是所有的工具都在Mac上可用
 
-	The HFS+ file system on our OS X workers is case-insensitive (which is the factory default),
-	and the files in a directory are returned sorted.
-	On Linux, on the other hand, the file system is case-sensitive, and returns directory entries in
-	the order they appear in the directory internally, which may appear random.
+	我们仍然致力于在Mac worker上建立工具链。软件的缺失部分通过Homebrew[可能获得](http://braumeister.org/)。
 
-	Your tests may implicitly rely on these behaviors, and could fail because of them.
+1. 文件系统行为不同
 
-1. They are different operating systems, after all
+	我们OS X worker的HFS+文件系统是大小写不敏感的（这也是出厂默认值），并且一个目录的文件返回的是有序的。相反，在Linux上文件系统是大小写敏感的，返回的目录条目是按照它们在目录内部出现的顺序，看起来可能是随机的。
 
-	Commands may have the same name on the Mac and Linux, but they may have different flags,
-	or the same flag may mean different things.
-	In some cases, commands that do the same thing could have different names.
-	These need to be investigated case by case.
+	你的测试如果隐式依赖于这些行为，可能因此失败。
 
-## Language Support Status
-Not all languages are equally available on all operating systems.
-Before you embark on the multi-os testing journey, be sure to check
-[this GitHub issue](https://github.com/travis-ci/travis-ci/issues/2320).
+1. 毕竟它们是不同的操作系统
 
-## Allowing Failures on Jobs Running on One Operating System
-If you want to ignore the results of jobs on one operating system, you can add the following
-to your `.travis.yml`:
+	在Mac与Linux上命令可能有相同的名字，但是它们可能有不同的标记，或者同样的标记可能意义不同。在某些情况下，做同样事情的命令可能有不同的名称。这些需要就事论事地研究。
+
+## 语言支持状态
+
+并不是所有的语言在所有的操作系统上都一样可用。在你开启多操作系统测试旅程之前，确保检查[这个GitHub问题](https://github.com/travis-ci/travis-ci/issues/2320)。
+
+## 允许运行在一个操作系统上的工作失败
+
+如果你希望忽略在一个操作系统上的工作的结果，你可以添加如下内容到你的`.travis.yml`：
 
 ```yaml
 matrix:

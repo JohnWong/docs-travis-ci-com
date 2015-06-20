@@ -1,20 +1,18 @@
 ---
-title: Deployment
+title: 部署
 layout: en
 permalink: /user/deployment/
 ---
 
-### Supported Providers
+### 支持的提供者
 
-Continuous Deployment to the following providers are currently supported out of the box:
+到下列提供者的持续集成当前即开即用：
 
 {% include deployments.html %}
 
-### Deploying to Multiple Providers
+### 部署到多个提供者
 
-Deploying to multiple providers is possible by adding the different providers
-to the `deploy` section as a list. For example, if you want to deploy to both
-cloudControl and Heroku, your `deploy` section would look something like this:
+部署到多个提供者可以通过作为列表添加不同的provider到`deploy`部分来使用。例如如果你希望部署到cloudControl与Heroku，你的`deploy`部分看起来会像这样：
 
     deploy:
       - provider: cloudcontrol
@@ -24,9 +22,9 @@ cloudControl and Heroku, your `deploy` section would look something like this:
       - provider: heroku
         api_key "YOUR HEROKU API KEY"
 
-### Conditional Releases with `on:`
+### 使用`on:`进行条件发布
 
-Deployment can be controlled by setting the `on:` for each deployment provider.
+可以通过为每个部署提供者设置`on:`来控制部署。.
 
     deploy:
       provider: s3
@@ -38,29 +36,23 @@ Deployment can be controlled by setting the `on:` for each deployment provider.
         branch: release
         condition: $MY_ENV = super_awesome
 
-When all conditions specified in the `on:` section are met, deployment for this
-provider will be peformed.
+当`on:`部分指定的所有条件都满足时，到这个提供者的部署将会执行。
 
-Common options are:
+通用选项是：
 
-1. **`repo`** Name of the repository, along with the owner (e.g., `travis-ci/dpl`).
+1. 库的**`repo`**名称与所有者（例如`travis-ci/dpl`）。
 
-1. **`branch`** Name of the branch. If omitted, this defaults to the `app`-specific branch, or `master`. If the branch name is not known ahead of time, you can specify
-  `all_branches: true` _instead of_ `branch: **` and use other conditions to control your deployment.
+1. 分支的**`branch`**名称。如果省略了，默认是特定的`app`分支或者`master`。如果分支名称不能提前知道，你可以指定`all_branches: true`而不是`branch: **`，并使用其他条件来控制你的部署。
 
-1. **`jdk`**, **`node`**, **`perl`**, **`php`**, **`python`**, **`ruby`**, **`scala`**, **`go`**: For language runtimes that support multiple versions,
-  you can limit the deployment to happen only on the job that matches the desired version.
+1. **`jdk`**，**`node`**，**`perl`**，**`php`**，**`python`**，**`ruby`**，**`scala`**，**`go`**：对于支持多个版本的语言运行时，你可以限制部署，使其只发生在匹配预期版本的工作中。
 
-1. **`condition`**: You may set bash condition with this option.
-This must be a string value, which will be pasted into a bash expression of the form
-`if [[ <condition> ]]; then <deploy>; fi`
-It can be complex, but there can be only one. For example, `$CC = gcc`.
+1. **`condition`**：你可能用这个选项设置了bash条件。它必须是一个字符串值，将会被放入`if [[ <condition> ]]; then <deploy>; fi`这样形式的bash表达式里。它可以是复杂的，也可以只有一个。比如`$CC = gcc`。
 
-1. **`tags`**: When set to `true`, the application is deployed when a tag is applied to the commit. This causes the `branch` condition to be ignored.
+1. **`tags`**：设置为`true`时，应用会在一个tag设置到提交上时部署。这会引起`branch`条件被忽略。
 
-#### Examples of Conditional Releases using `on:`
+#### 使用`on:`的条件发布的例子：
 
-This example deploys to Nodejistu only from the `staging` branch when the test has run on Node.js version 0.11.
+这个例子在0.11版本的Node.js运行测试时，将`staging`分支部署到Nodejistu。
 
     deploy:
       provider: nodejitsu
@@ -70,7 +62,7 @@ This example deploys to Nodejistu only from the `staging` branch when the test h
         branch: staging
         node: '0.11' # this should be quoted; otherwise, 0.10 would not work
 
-The next example deploys to S3 only when `$CC` is set to `gcc`.
+下一个例子只在`$CC`设置为`gcc`时部署到S3。
 
     deploy:
       provider: s3
@@ -81,7 +73,7 @@ The next example deploys to S3 only when `$CC` is set to `gcc`.
       on:
         condition: "$CC = gcc"
 
-This example deploys to GitHub Releases when a tag is set and the Ruby version is 2.0.0.
+这个例子当设置了tag并且Ruby版本是2.0.0时部署到Github Release。
 
     deploy:
       provider: releases
@@ -92,11 +84,11 @@ This example deploys to GitHub Releases when a tag is set and the Ruby version i
         tags: true
         rvm: 2.0.0
 
-### Other Providers
+### 其他提供者
 
-We are working on adding support for other PaaS providers. If you host your application with a provider not listed here and you would like to have Travis CI automatically deploy your application, please [get in touch](mailto:support@travis-ci.com).
+我们致力于支持其他Paas提供者。如果你的应用的提供者并不在列表内，你希望Travis CI自动部署你的应用，请[联系我们](mailto:support@travis-ci.com)。
 
-If you contribute to or experiment with the [deploy tool](https://github.com/travis-ci/dpl) make sure you use the edge version from GitHub:
+如果你希望贡献或者试验[部署工具](https://github.com/travis-ci/dpl)，确保你使用GitHub的edge版本：
 
     deploy:
       provider: awesome-experimental-provider
@@ -104,4 +96,4 @@ If you contribute to or experiment with the [deploy tool](https://github.com/tra
 
 ### Pull Requests
 
-Note that pull request builds skip deployment step altogether.
+注意pull request构建会完全忽略部署步骤。

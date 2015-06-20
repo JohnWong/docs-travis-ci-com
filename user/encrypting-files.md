@@ -1,39 +1,39 @@
 ---
-title: Encrypting Files
+title: 加密文件
 layout: en
 permalink: /user/encrypting-files/
 ---
 
-**Please note that encrypted files are not available for [pull requests from forks](/user/pull-requests#Security-Restrictions-when-testing-Pull-Requests).**
+**请注意加密文件在[来自fork的pull request](/user/pull-requests#Security-Restrictions-when-testing-Pull-Requests)中不可用。**
 
 <div id="toc"></div>
 
-## Preparation
+## 准备
 
-To follow along the examples in this guide you will need the Travis CI [Command Line Client](https://github.com/travis-ci/travis.rb#readme) installed:
+要依照本指南的例子，你需要安装Travis CI [命令行客户端](https://github.com/travis-ci/travis.rb#readme)：
 
     $ gem install travis
 
-Make sure you are [logged in](https://github.com/travis-ci/travis.rb#login):
+确保你已经[登录](https://github.com/travis-ci/travis.rb#login):
 
     $ travis login
 
-If you are using Travis Pro, you will have to login with the `--pro` flag:
+如果你在使用Travis Pro，你将不得不使用`--pro`标志来登录：
 
     $ travis login --pro
 
-See its [installation instructions](https://github.com/travis-ci/travis.rb#installation) for more information.
+更多信息参考其[安装指南](https://github.com/travis-ci/travis.rb#installation)。
 
-## Automated Encryption
+## 自动加密
 
-Assumptions:
+假设：
 
-* The repository is set up on Travis CI
-* You have version **1.7.0** or later of the Travis CI Command Line Client installed and setup up (you are logged in)
-* You have a local copy of the repository and a terminal open where your current working directory is said copy
-* In the repository is a file, called super_secret.txt, that you need on Travis CI but you don't want to publish its content on GitHub.
+* 库在Travis CI设置过
+* 你安装了**1.7.0**或更新版本的Travis CI命令行客户端并设置好了（你已经登陆）
+* 你有一个库的本地拷贝，并且在这份拷贝的工作目录下打开一个终端
+* 在库中有一个称作super_secret.txt文件，你在Travis CI中需要但并不希望发布其内容到GitHub。
 
-The `travis encrypt-file` command will encrypt a file for you using a symmetric encryption (AES-256), and it will store the secret in a secure variable. It will output the command you can use in your build script to decrypt the file.
+`travis encrypt-file`命令将会使用对称加密（AES-256）来加密一个文件，并切存储secret到一个安全变量。它将会输出你在构建脚本中可以使用命令来解密文件。
 
 {% highlight console %}
 $ travis encrypt-file super_secret.txt
@@ -52,7 +52,7 @@ Make sure not to add super_secret.txt to the git repository.
 Commit all changes to your .travis.yml.
 {% endhighlight %}
 
-You can also use `--add` to have it automatically add the decrypt command to your `.travis.yml`
+你也可以使用`--add`来让它自动添加解密命令道你的`.travis.yml`。
 
 {% highlight console %}
 $ travis encrypt-file super_secret.txt --add
@@ -65,14 +65,13 @@ Make sure not to add super_secret.txt to the git repository.
 Commit all changes to your .travis.yml.
 {% endhighlight %}
 
-### Encrypting multiple files
+### 加密多个文件
 
-Note that this method [works only with one file](https://github.com/travis-ci/travis.rb/issues/239).
+注意这个方法[只对一个文件有效](https://github.com/travis-ci/travis.rb/issues/239).
 
-If you need to encrypt multiple files, you will need to create an archive of sensitive files,
-then decrypt and expand it during the build.
+如果你需要加密多个文件，你需要创建一个敏感文件的压缩包，然后在构建时解密它并解压缩。
 
-Suppose we have sensitive files `foo` and `bar`.
+假设我们有敏感文件`foo`与`bar`。
 
 {% highlight console %}
 $ tar cvf secrets.tar foo bar
@@ -89,35 +88,35 @@ before_install:
   - tar xvf secrets.tar
 {% endhighlight %}
 
-(Adjust `$*_key` and `$*_iv` according to your needs.)
+（按照你的需要调整`$*_key`与`$*_iv`）
 
-### Caveat
+### 警告
 
-There is a report of this function not working on a local Windows machine. Please use a Linux or OS X machine.
+有报告指出这个功能在本地Windows机器上并不奏效，请在Linux或者OS X机器上使用。
 
-## Manual Encryption
+## 手动加密
 
-Assumptions:
+假设：
 
-* The repository is set up on Travis CI
-* You have the recent version of the Travis CI Command Line Client installed and setup up (you are logged in)
-* You have a local copy of the repository and a terminal open where your current working directory is said copy
-* In the repository is a file, called super_secret.txt, that you need on Travis CI but you don't want to publish its content on GitHub.
+* 库在Travis CI设置过
+* 你安装了最新版本的Travis CI命令行客户端并设置好了（你已经登陆）
+* 你有一个库的本地拷贝，并且在这份拷贝的工作目录下打开一个终端
+* 在库中有一个称作super_secret.txt文件，你在Travis CI中需要但并不希望发布其内容到GitHub。
 
-The file might be too large to encrypt it directly via the `travis encrypt` command. However, you can encrypt the file using a passphrase and then encrypt the passphrase. On Travis CI, you can use the passphrase to decrypt the file again.
+文件可能太大而无法通过`travis encrypt`命令来直接加密它。胆识你可以使用一个密码来加密文件，然后加密密码。在Travis CI中，你可以使用密码来再次解密文件。
 
-The set up process looks like this:
+建立的进程像这样：
 
-1. **Come up with a password.** First, you need a password. We recommend generating a random password using a tool like pwgen or 1password. In our example we will use `ahduQu9ushou0Roh`.
-2. **Encrypt the password and add it to your .travis.yml.** Here we can use the `encrypt` command: `travis encrypt super_secret_password=ahduQu9ushou0Roh --add` - note that if you set this up multiple times for multiple files, you will have to use different variable names so the passwords don't override each other.
-3. **Encrypt the file locally.** Using a tool that you have installed locally and that is also installed on Travis CI (see below).
-4. **Set up decryption command.** You should add the command for decrypting the file to the `before_install` section of your `.travis.yml` (see below).
+1. **提出一个密码。**首先你需要一个密码。我们推荐使用一个工具比如pwgen或者1password来生成一个随机密码。在我们的例子中，使用`ahduQu9ushou0Roh`。
+2. **加密你的密码并添加到你的.travis.yml。** 这里我们可以使用`encrypt`命令：`travis encrypt super_secret_password=ahduQu9ushou0Roh --add`。注意如果你为多个文件这样设置多次，你将不得不使用不同的变量名，这样密码不会互相覆盖。
+3. **在本地加密文件。** 使用你在本地安装并且Travis CI上也安装的一个工具（如下）。
+4. **设置解密命令。**你应该在你的`.travis.yml`中的`before_install`部分添加命令来解密文件（如下）。
 
-Be sure to add `super_secret.txt` to your `.gitignore` list, and to commit both the encrypted file and your `.travis.yml` changes.
+确保添加`super_secret.txt`到你的`.gitignore`列表，并同时提交加密的文件与你的`.travis.yml`的变更。
 
-### Using GPG
+### 使用GPG
 
-Set up:
+建立：
 
 {% highlight console %}
 $ travis encrypt super_secret_password=ahduQu9ushou0Roh --add
@@ -125,7 +124,7 @@ $ gpg -c super_secret.txt
 (will prompt you for the password twice, use the same value as for super_secret_password above)
 {% endhighlight %}
 
-Contents of the `.travis.yml` (besides whatever else you might have in there):
+`.travis.yml`的内容（除了在那里你需要的其他东西）：
 
 {% highlight yaml %}
 env:
@@ -135,12 +134,12 @@ before_install:
   - echo $super_secret_password | gpg super_secret.txt.gpg
 {% endhighlight %}
 
-The encrypted file is called `super_secret.txt.gpg` and has to be committed to the repository.
+加密后的文件是`super_secret.txt.gpg`，需要提交到库中。
 
-#### Using OpenSSL
+#### 使用OpenSSL
 
 
-Set up:
+建立：
 
 {% highlight console %}
 $ travis encrypt super_secret_password=ahduQu9ushou0Roh --add
@@ -148,7 +147,7 @@ $ openssl aes-256-cbc -k "ahduQu9ushou0Roh" -in super_secret.txt -out super_secr
 (keep in mind to replace the password with the proper value)
 {% endhighlight %}
 
-Contents of the `.travis.yml` (besides whatever else you might have in there):
+`.travis.yml`的内容（除了在那里你需要的其他东西）：
 
 {% highlight yaml %}
 env:
@@ -158,4 +157,4 @@ before_install:
   - openssl aes-256-cbc -k "$super_secret_password" -in super_secret.txt.enc -out super_secret.txt -d
 {% endhighlight %}
 
-The encrypted file is called `super_secret.txt.enc` and has to be committed to the repository.
+加密后的文件时`super_secret.txt.enc`，需要提交到库中。
