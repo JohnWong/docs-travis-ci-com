@@ -1,149 +1,143 @@
 ---
-title: The Build Environment
+title: 构建环境
 layout: en
 permalink: /user/ci-environment/
 ---
 
-### What This Guide Covers
+### 本指南覆盖什么内容
 
-This guide explain what packages, tools and settings are available in the Travis
-CI environment (often referred to as "CI environment").
+本指南在Travis CI环境（通常引用为“命令行环境”）中可用的包、工具与设置。
 
 <div id="toc"></div>
 
-## Overview
+## 概览
 
-Travis CI runs builds in isolated virtual machines that offer a vanilla build
-environment for every build.
+Travis CI在为每次构建提供vanilla构建环境的隔离的虚拟机上运行。
 
-This has the advantage that no state persists between builds, offering a clean
-slate and making sure that your tests run in an environment built from scratch.
+这样做的好处是构建之间没有状态留存，提供一个整洁的开始并确保你的测试运行在一个下载编译安装的环境中。
 
-Builds have access to a variety of services for data storage and messaging, and
-can install anything that's required for them to run.
+构建可以访问多种数据存储与消息传送的服务，并可以安装它们运行时需要的任何东西。
 
-## Virtualization environments
+## 虚拟环境
 
-Each build runs in one of the following three virtual environments:
+每次构建都运行在下面三个虚拟环境中的一个：
 
-* Standard (the default environment)
-* Container-based (the newer environment in which `sudo` commands are not available.
-* OSX for Objective-C projects
+* 标准的（默认环境）
+* 基于容器的（更新的环境，`sudo`命令不可用）。
+* Objective-C项目使用的OS X
 
-The following table summarizes the differences between the virtual environments:
+下表概述了虚拟环境之间的差异：
 
 <div class="header-row header-column">
 <table><thead>
 <tr>
 <th></th>
-<th>Standard</th>
-<th>Container-based</th>
+<th>标准的</th>
+<th>基于容器的</th>
 <th>OS X</th>
 </tr>
 </thead><tbody>
 <tr>
 <td>.travis.yml</td>
-<td><em>this is the default</em></td>
+<td><em>默认的</em></td>
 <td><code>sudo: false</code></td>
 <td><code>language: objective-c</code> or <code>os: osx</code></td>
 </tr>
 <tr>
-<td>Allows <code>sudo</code>, <code>setuid</code> and <code>setgid</code></td>
+<td>允许<code>sudo</code>，<code>setuid</code>与<code>setgid</code></td>
 <td>yes</td>
 <td>no</td>
 <td>N/A</td>
 </tr>
 <tr>
-<td>Boot Time</td>
-<td>slightly slower then Container-based</td>
-<td>slightl faster that Standard</td>
+<td>启动时间</td>
+<td>比基于容器的稍慢</td>
+<td>比标准的稍快</td>
 <td>N/A</td>
 </tr>
 <tr>
-<td>File System</td>
-<td>SIMFS, which is case sensitive and can return directory entities in random order</td>
+<td>文件系统</td>
+<td>SIMFS，大小写敏感返回目录项顺序随机</td>
 <td>AUFS</td>
-<td>HFS+, which is case-insensitive and returns directory entities alphabetically</td>
+<td>HFS+，大小写不敏感，返回目录项按字母顺序排列</td>
 </tr>
 <tr>
-<td>Cache available</td>
-<td>private only</td>
-<td>public only</td>
+<td>缓存可用</td>
+<td>仅限私有的</td>
+<td>仅限公共的</td>
 <td>N/A</td>
 </tr>
 <tr>
-<td>Operating System</td>
-<td>Ubuntu 12.04 LTS Server Edition 64 bit</td>
-<td>Ubuntu 12.04 LTS Server Edition 64 bit</td>
+<td>操作系统</td>
+<td>Ubuntu 12.04 LTS服务器版64位</td>
+<td>Ubuntu 12.04 LTS服务器版64位</td>
 <td>OS X Mavericks</td>
 </tr>
 <tr>
-<td>Memory</td>
+<td>内存</td>
 <td>3 GB</td>
 <td>3 GB</td>
 <td></td>
 </tr>
 <tr>
-<td>Cores</td>
-<td>Up to 2, bursted</td>
-<td>Up to 2, bursted</td>
+<td>内核</td>
+<td>高达2个，bursted</td>
+<td>高达2个，bursted</td>
 <td></td>
 </tr>
 </tbody></table>
 </div>
 
-All [Education Pack](https://education.travis-ci.com/) builds use Container-based infrastructure. 
+所有的[教育优惠](https://education.travis-ci.com/)构建都适用基于容器的基础设施。
 
-## Networking
+## 网络
 
-The virtual machines running the tests have IPv6 enabled.
-They do not have any external IPv4 address but are fully able to communicate with any external IPv4 service.
+虚拟机运行测试时IPv6是启用的。它们并没有外部IPv4地址但是完全能够与任何外部IPv4服务沟通。
 
-The IPv6 stack can have some impact on Java services in particular, where one might need to set the flag `java.net.preferIPv4Stack` to force the JVM to resort to the IPv4 stack should services show issues of not booting up or not being reachable via the network: `-Djava.net.preferIPv4Stack=true`.
+IPv6栈尤其会对Java服务有一些影响，可能需要设置标志`java.net.preferIPv4Stack`来在服务显示没有启动或者无法通过网络到达时强制JVM使用IPv4栈：`-Djava.net.preferIPv4Stack=true`。
 
-Most services work normally when talking to the local host by either `localhost` or `127.0.0.1`.
+大多数服务在使用`localhost`或`127.0.0.1`与本地主机通信时正常工作。
 
-## Environment common to all VM images
+## 所有虚拟机映像的通用环境
 
-### Version control
+### 版本控制
 
-All VM images have the following pre-installed
+所有虚拟机映像都预装了下列工具
 
- * A Git 1.8 release from the [git-core PPA](https://launchpad.net/~git-core/+archive/ubuntu/v1.8)
- * Mercurial (official Ubuntu packages)
- * Subversion (official Ubuntu packages)
-
-
-### Compilers & Build toolchain
-
-GCC, Clang, make, autotools, cmake, scons.
+ * 来自[git-core PPA](https://launchpad.net/~git-core/+archive/ubuntu/v1.8)的Git 1.8发布版
+ * Mercurial（官方Ubuntu包）
+ * Subversion（官方Ubuntu包）
 
 
-### Networking tools
+### 编译器与构建工具链
 
-curl, wget, OpenSSL, rsync
+GCC，Clang，make，autotools，cmake，scons。
+
+
+### 网络工具
+
+curl，wget，OpenSSL，rsync
 
 
 ### Go
 
-Go compiler/build tools.
+Go编译器/构建工具。
 
+### 运行时
 
-### Runtimes
-
-Every worker has at least one version of
+每个worker都有至少一个版本的
 
 * Ruby
 * OpenJDK
 * Python
 * Node.js
-* Go compiler/build tool
+* Go编译器/构建工具
 
-to accommodate projects that may need one of those runtimes during the build.
+来适应在构建时可能需要的这些运行时之一的项目。
 
-Language-specific workers have multiple runtimes for their respective language (for example, Ruby workers have about 10 Ruby versions/implementations).
+特定语言的worker有各个语言的多个运行时（例如Ruby worker有大约10个Ruby版本/实现）。
 
-### Data Stores
+### 数据存储
 
 * MySQL
 * PostgreSQL
@@ -158,76 +152,68 @@ Language-specific workers have multiple runtimes for their respective language (
 
 ### Firefox
 
-All virtual environments have recent version of Firefox installed, currently
-31.0 for Linux environments and 25.0 for OSX.
+所有的虚拟机安装了最新版的Firefox，当前Linux环境是31.0，OS X是25.0。
 
-If you need a specific version of Firefox, use the Firefox addon to install
-it during the `before_install` stage of the build.
+如果你需要指定版本的Firefox，在构建的`before_install`阶段使用Firefox插件来安装它。
 
-For example, to install version 17.0, add the following to your
-`.travis.yml` file:
+例如，要安装17.0版本，添加如下内容到你的`.travis.yml`文件：
 
     addons:
       firefox: "17.0"
 
-Please note that the addon only works in 64-bit Linux environments.
+请注意插件只能在64位的Linux环境下工作。
 
-### Messaging Technology
+### 消息传送技术
 
 * [RabbitMQ](http://rabbitmq.com)
 * [ZeroMQ](http://zeromq.org/)
 
-### Headless Browser Testing Tools
+### Headless浏览器与测试工具
 
 * [xvfb](http://en.wikipedia.org/wiki/Xvfb) (X Virtual Framebuffer)
 * [PhantomJS](http://phantomjs.org/)
 
-### Environment variables
+### 环境变量
 
-There is a [list of default environment variables](/user/environment-variables#Default-Environment-Variables) available in each build environment. 
+在每个构建环境有[默认环境变量列表](/user/environment-variables#Default-Environment-Variables)可用。
 
-### Libraries
+### 库
 
 * OpenSSL
 * ImageMagick
 
-### apt configuration
+### apt配置
 
-apt is configured to not require confirmation (assume -y switch by default) using both `DEBIAN_FRONTEND` env variable and apt configuration file. This means `apt-get install -qq` can be used without the -y flag.
+apt使用`DEBIAN_FRONTEND`环境变量与apt配置文件，配置为不需要确认（假设默认使用-y开关）。这意味着`apt-get install -qq`可以使用而不加-y标记。
 
-### Group membership
+### 组成员
 
-The user executing the build (`$USER`) belongs to one primary group derived from that user.
-If your project needs extra memberships to run the build, follow these steps:
+用户执行属于从用户派生的一个主要组（`$USER`）的构建。如果你的项目需要额外成员身份来运行构建，依照这些步骤：
 
-1. Set up the environment. This can be done any time during the build lifecycle prior to the build script execution.
-    1. Set up and export environment variables.
-    1. Add `$USER` to desired secondary groups: `sudo usermod -a -G SECONDARY_GROUP_1,SECONDARY_GROUP_2 $USER`
-    You may modify the user's primary group with `-g`.
-1. Your `script` would look something like:
+1. 设置环境。这可以在构建生命周期内构建脚本执行前的任何时间完成。
+    - 设置并导出环境变量。
+    - 添加`$USER`到期望的次级组：`sudo usermod -a -G SECONDARY_GROUP_1,SECONDARY_GROUP_2 $USER`。你可能使用`-g`修改用户的主要组。
+1. 你的`script`看起来像是：
 
 ```bash
 script: sudo -E su $USER -c 'COMMAND1; COMMAND2; COMMAND3'
 ```
-This will pass the environment variables down to a `bash` process which runs as `$USER`,
-while retaining the environment variables defined
-and belonging to secondary groups given above in `usermod`.
 
-### Build system information
+这将会把环境变量向下传递到一个以`$USER`运行的`bash`进程，同时保持环境变量已经定义且属于上文`usermod`中指出的次级组。
 
-In the build log, relevant software versions (including the available language versions)
-is show in the "Build system information".
+### 构建系统信息
 
-## Go VM images
+在构建日志中，相关软件版本（包括可用语言版本）显示在“构建系统信息”中。
 
-The following aliases are available, and are recommended
-in order to minimize frictions when images are updated:
+## Go虚拟机映像
+
+下面的别名是可用的，并推荐使用从而在映像升级时将阻力减到最小：
 
 * `go1`, `go1.0` → 1.0.3
 * `go1.1` → 1.1.2
 * `go1.2` → 1.2.2
 
-## JVM (Clojure, Groovy, Java, Scala) VM images
+## JVM（Clojure, Groovy, Java, Scala）虚拟机映像
 
 ### JDK
 
@@ -236,68 +222,62 @@ in order to minimize frictions when images are updated:
 * OpenJDK 6 (openjdk6)
 * Oracle JDK 8 (oraclejdk8)
 
-OracleJDK 7 is the default because we have a much more recent patch level compared to OpenJDK 7 from the Ubuntu repositories. Sun/Oracle JDK 6 is not provided because
-it reached End of Life in fall 2012.
+OracleJDK 7是默认的，相比于Ubuntu库的OpenJDK 7，我们的补丁等级要新很多。Sun/Oracle JDK 6并不提供，因为它在2012年秋季已经到达生命尽头。
 
-The `$JAVA_HOME` will be set correctly when you choose the `jdk` value for the JVM image.
+如果你在JVM映像选择了`jdk`，那么`$JAVA_HOME`将被正确设置。
 
-### Maven version
+### Maven版本
 
-Stock Apache Maven 3.2.x. Maven is configured to use Central and oss.sonatype.org mirrors at http://maven.travis-ci.org
+使用Apache Maven 3.2.x。Maven被配置为使用主要的与http://maven.travis-ci.org的oss.sonatype.org镜像。
 
-### Leiningen versions
+### Leiningen版本
 
-travis-ci.org has both standalone ("uberjar") Leiningen 1.7.x at `/usr/local/bin/lein1` and Leiningen 2.4.x at `/usr/local/bin/lein2`.
-The default is 2.4.x; `/usr/local/bin/lein` is a symbolic link to `/usr/local/bin/lein2`.
+travis-ci.org包含了标准的（“uberjar”）位于`/usr/local/bin/lein1`的Leiningen 1.7.x和位于`/usr/local/bin/lein2`的Leiningen 2.4.x。
+默认是2.4.x；`/usr/local/bin/lein`是到`/usr/local/bin/lein2`的符号连接。
 
-### SBT versions
+### SBT版本
 
-travis-ci.org potentially provides any version of Simple Build Tool (sbt or SBT) thanks to very powerful [sbt-extras](https://github.com/paulp/sbt-extras) alternative. In order to reduce build time, popular versions of sbt are already pre-installed (like for instance 0.13.5 or 0.12.4), but `sbt` command is able to dynamically detect and install the sbt version required by your Scala projects.
+因为有了强大的[sbt-extras](https://github.com/paulp/sbt-extras)可供使用，travis-ci.org潜在提供了任何版本的Simple Build Tool（sbt或SBT）。为了减少构建时间，sbt的最常用版本已经预装（例如0.13.5或0.12.4），但是`sbt`命令可以动态探测和安装你的Scala项目需要的版本。
 
-### Gradle version
+### Gradle版本
 
-Gradle 2.0.
+Gradle 2.0。
 
-## Erlang VM images
+## Erlang虚拟机影响
 
-### Erlang/OTP releases
+### Erlang/OTP发布版
 
-Erlang/OTP releases are built using [kerl](https://github.com/spawngrid/kerl).
+Erlang/OTP发布使用[kerl](https://github.com/spawngrid/kerl)构建。
 
 
 ### Rebar
 
-travis-ci.org provides a recent version of Rebar. If a repository has rebar binary bundled at `./rebar` (in the repo root), it will
-be used instead of the preprovisioned version.
+travis-ci.org提供了最新版本的Rebar。如果一个代码库的`./rebar`（项目根目录）下有rebar二进制打包，那么将会使用它为非预先提供的版本。
 
+## Node.js虚拟机映像
 
-## Node.js VM images
+### Node.js版本
 
-### Node.js versions
-
-Node runtimes are built using [nvm](https://github.com/creationix/nvm).
+Node运行时使用[nvm](https://github.com/creationix/nvm)构建。
 
 ### SCons
 
 Scons
 
-## Haskell VM images
+## Haskell虚拟机映像
 
-### Haskell Platform Version
+### Haskell平台版本
 
-[Haskell Platform](http://hackage.haskell.org/platform/contents.html) 2012.02 and GHC 7.0, 7.4, 7.6 and 7.8.
+[Haskell平台](http://hackage.haskell.org/platform/contents.html) 2012.02与GHC 7.0，7.4，7.6与7.8。
 
 
-## Perl VM images
+## Perl虚拟机映像
 
-### Perl versions
+### Perl版本
 
-Perl versions are installed via [Perlbrew](http://perlbrew.pl/).
-Those runtimes that end with the `-extras` suffix have been compiled with
-`-Duseshrplib` and `-Duseithreads` flags.
-These also have aliases with the `-shrplib` suffix.
+Perl版本是通过[Perlbrew](http://perlbrew.pl/)安装的。这些以`-extras`后缀结束的运行时使用`-Duseshrplib`与`-Duseithreads`标志编译。这些也有带`-shrplib`后缀的别名。
 
-### Pre-installed modules
+### 预装的模块
 
 cpanm (App::cpanminus)
 Dist::Zilla
@@ -312,20 +292,19 @@ Test::Most
 Test::Pod
 Test::Pod::Coverage
 
-## PHP VM images
+## PHP虚拟机映像
 
-### PHP versions
+### PHP版本
 
-PHP runtimes are built using [php-build](https://github.com/CHH/php-build).
+PHP运行时使用[php-build](https://github.com/CHH/php-build)构建。
 
-[hhvm](https://github.com/facebook/hhvm) is also available.
-and the nighly builds are installed on-demand (as `hhvm-nightly`).
+[hhvm](https://github.com/facebook/hhvm)可用。并且nighly构建按需安装（作为`hhvm-nightly`）。
 
 ### XDebug
 
-Is supported.
+已经支持。
 
-### Extensions
+### 扩展
 
     [PHP Modules]
     bcmath
@@ -388,40 +367,38 @@ Is supported.
     [Zend Modules]
     Xdebug
 
-## Python VM images
+## Python虚拟机映像
 
-### Python versions
+### Python版本
 
-Every Python has a separate virtualenv that comes with `pip` and `distribute` and is activated before running the build.
+每个Python都有一个来自`pip`与`distribute`的隔离的虚拟环境，并在构建运行前激活。
 
-Python 2.4 and Jython *are not supported* and there are no plans to support them in the future.
+*不支持*Python 2.4与Jython，并且将来也没有计划支持它们。
 
-### Preinstalled pip packages
+### 预装的pip包
 
 * nose
 * py.test
 * mock
 * wheel
 
-On all versions except pypy and pypy3 have `numpy` as well.
+除了pypy与pypy3的所有版本也安装了`numpy`。
 
-## Ruby (aka common) VM images
+## Ruby（也就是通用的）虚拟机映像
 
-### Ruby versions/implementations
+### Ruby版本/实现
 
-[Ruby 1.8.6 and 1.9.1 are no longer provided on travis-ci.org](https://twitter.com/travisci/status/114926454122364928).
+[travis-ci.org不再提供Ruby 1.8.6与1.9.1](https://twitter.com/travisci/status/114926454122364928).
 
-Rubies are built using [RVM](http://rvm.io/) that is installed per-user and sourced from `~/.bashrc`.
+Ruby使用[RVM](http://rvm.io/)构建.RVM为每个用户安装，并且由`~/.bashrc`引入。
 
-RVM is able to install other
-versions on demand. For example, to test against Rubinius 2.2.1, you can use
-`rbx-2.2.1` and RVM will download binaries on-demand.
+可以根据需要按需安装其他版本的RVM。例如要测试Rubinius 2.2.1，你可以使用`rbx-2.2.1`，RVM将会按需下载二进制。
 
-### Bundler version
+### Bundler版本
 
-Recent 1.7.x version (usually the most recent)
+目前是1.7.x版本（通常是最新的）
 
-### Gems in the global gem set
+### 全局gem集合中的gem
 
 * bundler
 * rake

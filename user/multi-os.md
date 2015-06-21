@@ -18,7 +18,7 @@ permalink: /user/multi-os/
 
 ## 简介
 
-如果你的代码打算在多个操作系统上使用（例如Ruby gem，Python库，Java虚拟机程序），你从测试既定目标中受益。
+如果你的代码打算在多个操作系统上使用（例如Ruby gem，Python库，JVM程序），你从测试既定目标中受益。
 
 Travis CI通过提供在Linux与OS X的测试来提供帮助。
 
