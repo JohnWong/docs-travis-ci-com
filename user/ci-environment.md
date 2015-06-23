@@ -6,7 +6,7 @@ permalink: /user/ci-environment/
 
 ### 本指南覆盖什么内容
 
-本指南在Travis CI环境（通常引用为“命令行环境”）中可用的包、工具与设置。
+本指南在Travis CI环境（通常引用为“持续集成环境”）中可用的包、工具与设置。
 
 <div id="toc"></div>
 
