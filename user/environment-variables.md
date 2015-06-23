@@ -4,43 +4,45 @@ layout: en
 permalink: /user/environment-variables/
 ---
 
-A common way to customize the build process is to use environment variables, which can be accessed from any stage in your build process.
+一个常用的定制构建流程的方法是使用环境变量，可以在你的构建的任何阶段访问它。
 
 <div id="toc"></div>
 
-* Variables defined in [.travis.yml](#Defining-Variables-in-.travis.yml) are tied to a certain commit. Changing them requires a new commit, restarting an old build uses the old values. They are also available automatically on forks of the repository. Define variables in `.travis.yml` that:
+* [.travis.yml](#Defining-Variables-in-.travis.yml)中定义的变量绑定到某一个提交上。修改它们需要一次新提交，重启一次老的构建会使用旧的变量。它们在fork的库中自动可用。在`.travis.yml`中定义这些变量：
 
-	+ are needed for the build to run and that don't contain sensitive data. For instance, a test suite for a Ruby application might require `$RACK_ENV` to be set to `test`.
-	+ differ per branch.
-	+ differ per job.
+	+ 构建运行所需并且不包含敏感数据。例如Ruby的测试套件可能需要将`$RACK_ENV`设置为`test`。
+	+ 每个分支不同的
+	+ 每个工作不同的
 
-* Variables defined in [repository settings](#Defining-Variables-in-Repository-Settings) are the same for all builds. When you restart an old build, it uses the latest values. These variables are not automatically available to forks. Define variables in the Repository Settings that:
+* 定义在[repository settings](#Defining-Variables-in-Repository-Settings)中的变量对于所有构建来说相同。当你重新运行一个老的构建，它使用最新的值。这些变量在fork的库中并不自动可用。在Repository Settings中定义这些变量：
 
-	+ differ per repository.
-	+ contain sensitive data, such as third-party credentials.
+	+ 每个库不同的
+	+ 包含敏感数据，比如第三方认证信息。
 
-* Use [Encrypted variables](#Encrypted-Variables) for sensitive data such as authentication tokens.
+* 使用[Encrypted variables](#Encrypted-Variables)存放敏感数据，比如身份验证token。
 
-> If you define a variable with the same name in `.travis.yml` and in the Repository Settings, the one in `.travis.yml` takes precedence. If you define a variable as both encrypted and unencrypted, the one defined later in the file takes precedence.
 
-There is also a [complete list of default environment variables](#Default-Environment-Variables) which are present in all Travis CI environments.
+> 如果你在`.travis.yml`与Repository Settings中定义了相同名称的变量，则优先使用`.travis.yml`中的。如果你将一个变量定义为加密的与不加密的，那么在文件中后定义的将会优先使用。
 
-## Defining Variables in .travis.yml
+并没有在所有Travis CI环境中出现的一个[默认环境变量的完全列表](#Default-Environment-Variables)。
 
-To define an environment variable in your `.travis.yml`, add the `env` line, for example:
+## 在.travis.yml中定义环境变量
+
+要在你的`.travis.yml`中定义一个环境变量，添加`env`行，例如：
 
     env:
     - DB=postgres
 
-> Note that environment variable values may need quoting. For example, if they have asterisks (`*`) in them:
+> 注意环境变量值可能需要放入引号中。例如，如果你在其中需要星号（*）：
+> 
 > ````
 > env:
 > PACKAGE_VERSION="1.0.*"
 > ````
 
-### Defining Multiple Variables per Item
+### 每一条定义多个变量
 
-When you specify multiple variables per item in the `env` array (matrix variables), one build is triggered per item.
+如果你在`env`数组中每一项指定了多个变量（变量矩阵），每一条都会触发一次构建。
 
     rvm:
       - 1.9.3
@@ -49,17 +51,17 @@ When you specify multiple variables per item in the `env` array (matrix variable
       - FOO=foo BAR=bar
       - FOO=bar BAR=foo
 
-this configuration triggers **4 individual builds**:
+这个配置将会触发**4次独立构建**：
 
-1. Ruby 1.9.3 with `FOO=foo` and `BAR=bar`
-2. Ruby 1.9.3 with `FOO=bar` and `BAR=foo`
-3. Rubinius latest version (rbx) with `FOO=foo` and `BAR=bar`
-4. Rubinius latest version (rbx) with `FOO=bar` and `BAR=foo`
+1. Ruby 1.9.3与`FOO=foo`并且`BAR=bar`
+2. Ruby 1.9.3与`FOO=bar`并且`BAR=foo`
+3. 最新版Rubinius（rbx）与`FOO=foo`并且`BAR=bar`
+4. 最新版Rubinius（rbx）与`FOO=bar`并且`BAR=foo`
 
 
-### Global Variables
+### 全局变量
 
-Sometimes you may want to use environment variables that are global to the matrix, i.e. they're inserted into each matrix row. That may include keys, tokens, URIs or other data that is needed for every build. In such cases, instead of manually adding such keys to each `env` line in matrix, you can use `global` and `matrix` keys to differentiate between those two cases. For example:
+有时你可能希望使用矩阵中全局的环境变量，例如插入到每个矩阵行。它们可能包含密钥，token，URI或者其他每次构建需要的数据。在这种情况下你可以使用`global`与`matrix`键来区分两种情况而不必手动将这样的键加入到矩阵中的每一行。例如：
 
     env:
       global:
@@ -69,31 +71,31 @@ Sometimes you may want to use environment variables that are global to the matri
         - USE_NETWORK=true
         - USE_NETWORK=false
 
-triggers builds with the following `env` rows:
+出发了下面`env`行的构建：
 
     USE_NETWORK=true CAMPFIRE_TOKEN=abc123 TIMEOUT=1000
     USE_NETWORK=false CAMPFIRE_TOKEN=abc123 TIMEOUT=1000
 
-## Defining Variables in Repository Settings
+## Repository Settings中定义变量
 
-To define variables in Repository Settings, make sure you're logged in, navigate to the repository in question, choose "Settings" from the cog menu, and click on "Add new variable" in the "Environment Variables" section.
-
+要在Repository Settings中定义变量，确保你已经登陆，导航到正在考虑的repository，在齿轮菜单中选择“Settings”，点击“Environment Variables”部分的“Add new variable”。
+  
 <figure>
-  ![Environment Variables in the Repository Settings](/images/settings-env-vars.png)
+  <img src="{{ "/images/settings-env-vars.png" | prepend: site.baseurl }}">
   <figcaption>Environment Variables in the Repository Settings</figcaption>
 </figure>
 
-By default, the value of these new environment variables is hidden from the `export` line in the logs. This corresponds to the behavior of [encrypted variables](#Encrypted-Variables) in your `.travis.yml`.
+这些新环境变量的值在日志中`export`行默认隐藏。这是为了符合你的`.travis.yml`中[加密变量](#Encrypted-Variables)的行为。
 
-Similarly, we do not provide these values to untrusted builds, triggered by pull requests from another repository.
+类似地，我们在从其他库的pull request出发的非信任的构建中并不提供这些值。
 
-As an alternative to the web interface, you can also use the CLI's [`env`](https://github.com/travis-ci/travis.rb#env) command.
+作为一个web界面的替代选择，你可以使用命令行界面的[`env`](https://github.com/travis-ci/travis.rb#env)命令。
 
-## Encrypted Variables
+## 加密变量
 
-Variables can be encrypted so that their content is not shown in the corresponding `export` line in the build. This is used to provide sensitive data, like API credentials, to the Travis CI build. Encrypted variables are not added to untrusted builds such as pull requests coming from another repository.
+可以加密变量，这样他们的内容在构建相应的`export`行不会显示。这是用来为Travis CI构建提供敏感数据，比如API认证信息。加密变量也不会添加到非信任构建中，比如来自另一个库的pull request。
 
-A `.travis.yml` file containing encrypted variables looks like this:
+一个`.travis.yml`文件包含的加密变量类似下面这样：
 
     env:
       global:
@@ -104,79 +106,68 @@ A `.travis.yml` file containing encrypted variables looks like this:
         - USE_NETWORK=false
         - secure: <you can also put encrypted vars inside matrix>
 
-> Encrypted environment variables are not available to pull requests from forks due to the security risk of exposing such information to unknown code.
+> 加密的环境变量在来自fork的pull request中不可用，这是由于暴露这样的信息给未知的代码存在安全风险。
 
-### Encrypting Variables Using a Public Key
+### 使用公共密钥加密变量
 
-Encrypt environment variables using the public key attached to your repository using the travis gem:
+travis gem可以使用附加到你的库的公共密钥来加密环境变量：
 
     gem install travis
     cd my_project
     travis encrypt MY_SECRET_ENV=super_secret
 
-To automatically add the encrypted environment variable to your `.travis.yml`:
+要自动添加加密的环境变量到你的`.travis.yml`：
 
     travis encrypt MY_SECRET_ENV=super_secret --add env.matrix
 
-> Encryption and decryption keys are tied to the repository. If you fork a project and add it to Travis CI, it will have different keys to the original.
+> 加密和解密的密钥与库相关联。如果你fork一个库并将其添加到Travis CI，它将会有与原库不同的键。
 
 The encryption scheme is explained in more detail in [Encryption keys](/user/encryption-keys).
 
-### Convenience Variables
+### 便利变量
 
-To make using encrypted environment variables easier, the following environment variables are available:
+为了使加密环境变量更加容易，下面的环境变量时可用的。
 
-* `TRAVIS_SECURE_ENV_VARS` "true" or "false" depending on the availability of environment variables
-* `TRAVIS_PULL_REQUEST` the pull request number if the current job is a pull request, or "false" if it's not a pull request.
+* `TRAVIS_SECURE_ENV_VARS` “true”或者“false” 取决于环境变量是否可用
+* `TRAVIS_PULL_REQUEST` 如果当前工作是一个pull request，那么变量是pull request的号码，否则是“false”
 
-## Default Environment Variables
+## 默认环境变量
 
-The following default environment variables are available to all builds.
+下面的默认环境变量对所有的构建都可用。
 
 * `CI=true`
 * `TRAVIS=true`
 * `CONTINUOUS_INTEGRATION=true`
 * `DEBIAN_FRONTEND=noninteractive`
 * `HAS_JOSH_K_SEAL_OF_APPROVAL=true`
-* `USER=travis` (**do not depend on this value**)
-* `HOME=/home/travis` (**do not depend on this value**)
+* `USER=travis` (**不要依赖这个值**)
+* `HOME=/home/travis` (**不要依赖这个值**)
 * `LANG=en_US.UTF-8`
 * `LC_ALL=en_US.UTF-8`
 * `RAILS_ENV=test`
 * `RACK_ENV=test`
 * `MERB_ENV=test`
 * `JRUBY_OPTS="--server -Dcext.enabled=false -Xcompile.invokedynamic=false"`
-* `JAVA_HOME` is set to the appropriate value.
+* `JAVA_HOME`被设置为适当的值
 
-Additionally, Travis CI sets environment variables you can use in your build, e.g.
-to tag the build, or to run post-build deployments.
+此外Travis CI设置你在你的构建中可以使用的环境变量，例如用来为构建打标签或者运行构建后的部署。
 
-* `TRAVIS_BRANCH`:For builds not triggered by a pull request this is the
-  name of the branch currently being built; whereas for builds triggered
-  by a pull request this is the name of the branch targeted by the pull
-  request (in many cases this will be `master`).
-* `TRAVIS_BUILD_DIR`: The absolute path to the directory where the repository
-  being built has been copied on the worker.
-* `TRAVIS_BUILD_ID`: The id of the current build that Travis CI uses internally.
-* `TRAVIS_BUILD_NUMBER`: The number of the current build (for example, "4").
-* `TRAVIS_COMMIT`: The commit that the current build is testing.
-* `TRAVIS_COMMIT_RANGE`: The range of commits that were included in the push
-  or pull request.
-* `TRAVIS_JOB_ID`: The id of the current job that Travis CI uses internally.
-* `TRAVIS_JOB_NUMBER`: The number of the current job (for example, "4.1").
-* `TRAVIS_PULL_REQUEST`: The pull request number if the current job is a pull
-  request, "false" if it's not a pull request.
-* `TRAVIS_SECURE_ENV_VARS`: Whether or not encrypted environment vars are being
-  used. This value is either "true" or "false".
-* `TRAVIS_REPO_SLUG`: The slug (in form: `owner_name/repo_name`) of the
-  repository currently being built. (for example, "travis-ci/travis-build").
-* `TRAVIS_OS_NAME`: On multi-OS builds, this value indicates the platform the job is running on.
-  Values are `linux` and `osx` currently, to be extended in the future.
-* `TRAVIS_TAG`: If the current build for a tag, this includes the tag's name.
 
-Language-specific builds expose additional environment variables representing
-the current version being used to run the build. Whether or not they're set
-depends on the language you're using.
+* `TRAVIS_BRANCH`：对于非pull request触发的构建，这是当前构建使用的分支的名称；而对于pull request触发的构建，这是pull request的目标分支的名称（在许多情况下将会是`master`）。
+* `TRAVIS_BUILD_DIR`：正在构建的库拷贝到worker上的绝对路径。
+* `TRAVIS_BUILD_ID`：Travis CI内部使用的当前构建的id。
+* `TRAVIS_BUILD_NUMBER`：当前构建的号码（例如“4”）。
+* `TRAVIS_COMMIT`：当前构建正在测试的提交。
+* `TRAVIS_COMMIT_RANGE`：在推送或者pull request中包含的提交范围。
+* `TRAVIS_JOB_ID`：Travis CI内部使用的当前工作的id。
+* `TRAVIS_JOB_NUMBER`：当前工作的号码（例如“4.1”）。
+* `TRAVIS_PULL_REQUEST`：如果当前工作是一个pull request，是pull request的数字；否则是“false”。
+* `TRAVIS_SECURE_ENV_VARS`：安全环境变量是否在使用。值是“true”或“false”。
+* `TRAVIS_REPO_SLUG`：当前正在构建的库的slug（以`owner_name/repo_name`的形式）。（例如“travis-ci/travis-build”）。
+* `TRAVIS_OS_NAME`：在多操作系统构建中，这个值指示工作正在运行的平台。值当前是`linux`与`osx`，未来可能会扩展。
+* `TRAVIS_TAG`：如果当前构建是在一个标签上，这包含了标签的名称。
+
+特定语言的构建暴露了用来运行构建的当前版本的额外环境变量。是否设置取决于你所使用的语言。
 
 * `TRAVIS_DART_VERSION`
 * `TRAVIS_GO_VERSION`
@@ -193,7 +184,7 @@ depends on the language you're using.
 * `TRAVIS_RUST_VERSION`
 * `TRAVIS_SCALA_VERSION`
 
-The following environment variables are available for Objective-C builds.
+下列环境变量在Objective-C构建中可用。
 
 * `TRAVIS_XCODE_SDK`
 * `TRAVIS_XCODE_SCHEME`
