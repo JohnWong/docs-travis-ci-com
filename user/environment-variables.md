@@ -82,7 +82,7 @@ permalink: /user/environment-variables/
   
 <figure>
   <img src="{{ "/images/settings-env-vars.png" | prepend: site.baseurl }}">
-  <figcaption>Environment Variables in the Repository Settings</figcaption>
+  <figcaption>Repository Settings中的环境变量</figcaption>
 </figure>
 
 这些新环境变量的值在日志中`export`行默认隐藏。这是为了符合你的`.travis.yml`中[加密变量](#Encrypted-Variables)的行为。
