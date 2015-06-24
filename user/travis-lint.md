@@ -4,24 +4,24 @@ layout: en
 permalink: /user/travis-lint/
 ---
 
-Validating your `.travis.yml` file before committing it reduces common build errors such as
+在提交前验证你的`.travis.yml`文件来减少常见构建错误，例如
 
-* invalid [YAML](http://yaml-online-parser.appspot.com/) in `.travis.yml` 
-* missing `language` key
-* unsupported [runtime versions](/user/ci-environment/) of Ruby, PHP, OTP, etc
-* deprecated features or runtime aliases
+* `.travis.yml`中的无效[YAML](http://yaml-online-parser.appspot.com/)
+* 缺失的`language`键
+* Ruby、PHP、OTP等的不支持的[运行时版本](/user/ci-environment/)
+* 弃用的特性或运行时别名
 
-### Using lint.travis-ci.org
+### 使用lint.travis-ci.org
 
-You can use the [web app](http://lint.travis-ci.org) by entering a link to your repository or by pasting the contents of your `.travis.yml` into the form.  
+你可以通过进入一个到你的库的链接或者将你的`.travis.yml`的内容粘贴到表格中来使用[web app](http://lint.travis-ci.org)。
 
-### Using the travis-lint command-line tool
+### 使用travis-lint命令行工具
 
-To install the `travis-lint` command-line tool, which requires Ruby 1.8.7+ and RubyGems:
+要安装`travis-lint`命令行工具，需要Ruby 1.8.7+与RubyGems：
 
     gem install travis-lint
 
-To run `travis-lint`:
+要运行`travis-lint`：
 
     # from any directory
     travis-lint [path to your .travis.yml]
