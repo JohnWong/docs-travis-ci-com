@@ -1,19 +1,18 @@
 ---
-title: Configuring Build Notifications
+title: 配置构建提醒
 layout: en
 permalink: /user/notifications/
 ---
 
 <div id="toc"></div>
 
-## Notifications
+## 提醒
 
-Travis CI can notify you about your build results through email, IRC and/or webhooks.
+Travis CI可以通过邮件、IRC或者webhook来通知你构建结果。
 
-By default, email notifications will be sent to the committer and the commit
-author, if they are members of the repository (that is, they have push or admin
-permissions for public repositories, or if they have pull, push or admin
-permissions for private repositories).
+如果提交者或者提交的作者是库的成员（也就是他们有公共库的推送或者管理权限，或者有私有库的拉取、推送或者管理权限），那么默认会发送邮件通知给他们。
+
+
 
 And it will by default send emails when, on the given branch:
 
