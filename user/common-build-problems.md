@@ -93,15 +93,13 @@ Poltergeist有它自己的超时设置：
     # .travis.yml
     bundler_args: --without development debug
 
-## Mac：签名错误
+## Mac：代码签名错误
 
-With Mavericks, quite a lot has changed in terms of code signing and the keychain application.
+在Mavericks下，代码签名与keychain应用的条款修改了很多。
 
-Signs of issues can be errors messages stating that an identity can't be found and that "User
-interaction is not allowed."
+有问题的签名可能是指出身份未找到与“用户交互不允许”的错误信息。
 
-The keychain must be marked as the default keychain, must be unlocked explicitly and the build needs to make sure that the keychain isn't locked before the critical point in the build is reached. The following set of commands takes care
-of this:
+keychain必须被标记为默认的keychain，必须明确地解锁，并且构建需要确保在到达构建的鉴定节点前keychain不被锁。下面的命令集合处理这种情况：
 
     KEY_CHAIN=ios-build.keychain
     security create-keychain -p travis $KEY_CHAIN
@@ -112,56 +110,48 @@ of this:
     # Set keychain locking timeout to 3600 seconds
     security set-keychain-settings -t 3600 -u $KEY_CHAIN
 
-## Mac: Errors running CocoaPods
+## Mac：运行CocoaPods出错
 
-CocoaPods usage can fail for a few reasons currently.
+目前CocoaPods的使用可能由于一些原因失败。
 
-### Newer version of CocoaPods required
+### 需要较新版本的CocoaPods
 
-Most Pods now require CocoaPods 0.32.1, but we still have 0.21 preinstalled. If
-you're seeing this error, add this to your `.travis.yml`:
+大多数Pods目前需要CocoaPods 0.32.1，但是我们仍然预装了0.21。如果你遇到这个错误，添加如下内容到你的`.travis.yml`：
 
     before_install:
       - gem install cocoapods -v '0.32.1'
 
-### CocoaPods can't be found
+### CocoaPods未找到
 
-CocoaPods isn't currently installed on all available Rubies, which unfortunately
-means it will fail when using the default Ruby, which is 2.0.0.
+CocoaPods目前并不在所有可用的Ruby上安装，不幸的是这意味着在使用默认版本2.0.0的Ruby时将会失败。
 
-To work around this issue, you can either install CocoaPods manually as shown
-above, or you can switch to Ruby 1.9.3 in your `.travis.yml`, which should work
-without any issues:
+要避免这个问题，你可以如上所示手动安装CocoaPods，或者在你的`.travis.yml`中切换到Ruby 1.9.3，这样将会没有任何问题地工作：
 
     rvm: 1.9.3
 
-### CocoaPods fails with a segmentation fault
+### CocoaPods段错误失败
 
-On Ruby 2.0.0, CocoaPods has been seen crashing with a segmentation fault.
+在Ruby 2.0.0，CocoaPods会因为一个段错误崩溃。
 
-You can work around the issue by using Ruby 1.9.3, which hasn't shown these
-issues. Add this to your `.travis.yml`:
+你可以通过使用Ruby 1.9.3来避免，这样就不会显示这些问题。添加如下内容到你的`.travis.yml`：
 
     rvm: 1.9.3
 
-## System: Required language pack isn't installed
+## 系统：未安装所需的语言包
 
-The Travis CI build environments currently have only the en_US language pack
-installed. If you get an error similar to : "Error: unsupported locale
-setting", then you may need to install another language pack during your test
-run.
+Travis CI构建环境目前只安装了en_US语言包。如果你遇到类似“Error: unsupported locale
+setting”的错误，那么你可能需要在你的测试运行时安装另一个语言包。
 
-This can be done with the follow addition to your `.travis.yml`:
+可以通过在你的`.travis.yml`中添加如下内容来完成：
 
     before_install:
       - sudo apt-get update && sudo apt-get --reinstall install -qq language-pack-en language-pack-de
 
-The above addition will reinstall the en\_US language pack, as well as the de\_DE
-language pack.
+上面的额外内容将会重新安装en_US与de_DE语言包。
 
-## Linux: apt fails to install package with 404 error.
+## Linux：apt由于404错误安装包失败
 
-This is often caused by old package database and can be fixed by adding the following to `.travis.yml`:
+这通常是由于老的包数据库引起的，可以通过在你的`.travis.yml`添加如下内容来修复：
 
     before_install:
       - sudo apt-get update
