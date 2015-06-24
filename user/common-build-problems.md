@@ -1,69 +1,48 @@
 ---
-title: Common Build Problems
+title: 常见构建问题
 layout: en
 permalink: /user/common-build-problems/
 ---
 
 <div id="toc"></div>
 
-## My tests broke but were working yesterday
+## 我的测试被打断但是昨天还是好的
 
-A very common cause when a test is suddenly breaking without any major code
-changes involved is a change in upstream dependencies.
+主要代码没有任何变更但是测试突然打断的一个非常常见的原因是上游依赖的变更。
 
-This can be a Ubuntu package or any of your project's language dependencies,
-like RubyGems, NPM packages, Pip, Composer, etc.
+这可能是一个Ubuntu包或者你的项目语言的任何依赖，比如RubyGems，NPM包，Pip，Composer等。
 
-To find out if this is the case, restart a build that used to be green, the last
-known working one, for instance. If that build suddenly fails too, there's a
-good chance, that a dependency was updated and is causing the breakage.
+要找出是否是这个原因，重启一次曾经是绿色的变更，例如上次已知有效的那个。如果那次构建也突然失败了，那么很可能是一个依赖更新并引起了中断。
 
-Make sure to check the list of dependencies in the build log, usually output
-including versions, and see if there's anything that's changed.
+确保检查了构建日志中的依赖列表，通常输出中包含版本，并检查是否有什么东西变更了。
 
-Sometimes, this can also be caused by an indirect dependency that was updated.
+有时可能是非直接依赖更新引起的。
 
-After figuring out which dependency was updated, lock it to the last known
-version.
+在找出更新的依赖后，将其锁定为上次已知的版本。
 
-Additionally, we update our build environment regularly, which brings in newer
-versions of languages and the running services. Make sure to follow our
-[changelog](http://changelog.travis-ci.com) to get a hold of the latest updates.
+此外我们定期更新我们的构建环境，这将会带来语言和运行的服务的较新版本。确保关注我们的[changelog](http://changelog.travis-ci.com)来得到最近的更新。
 
-## My build script is killed without any error
+## 我的构建脚本被杀而没有任何错误
 
-Sometimes, you'll see a build script being causing an error, and the message in
-the log will be something like `Killed`.
+有时你会看到一个构建脚本引起了错误，日志中的消息类似于`Killed`。
 
-This is usually caused by the script or one of the programs it runs exhausting
-the memory available in the build sandbox, which is currently 3GB. Plus, there
-are two cores available, bursted.
+这通常是由于脚本或者某个程序在构建沙盒中耗尽了内存，目前是3GB。另外可以使用2个核，bursted。
 
-Depending on the tool in use, this can be cause by a few things:
+依赖于正在使用的工具，这可能是由一些东西引起：
 
-* Ruby test suite consuming too much memory
-* Tests running in parallel using too many processes or threads (e.g. using the
-  `parallel_test` gem)
-* g++ needing too much memory to compile files, for instance with a lot of
-  templates included.
+* Ruby测试套件使用了太多内存
+* 测试并行运行，使用了太多进程或者线程（例如使用`parallel_test`gem）
+* g++需要太多内存来编译文件，例如包含了许多模版
 
-For parallel processes running at the same time, try to reduce the number. More
-than two to four processes should be fine, beyond that, resources are likely to
-be exhausted.
+对于同时运行的并行进程，尝试减少数量。2-4个进程不错，超过这么多，资源可能耗尽。
 
-With Ruby processes, check the memory consumption on your local machine, it's
-likely to show similar causes. It can be caused by memory leaks or by custom
-settings for the garbage collector, for instance to delay a sweep for as long as
-possible. Dialing these numbers down should help.
+对于Ruby进程，检查你本地机器的内存消耗，这大概会展示类似的原因。可能是内存泄漏或者定制的垃圾回收设定引起的，例如尽量晚地延迟清理。降低这些数字可能有用。
 
-## Ruby: RSpec returns 0 even though the build failed
+## Ruby：即使构建失败，RSpec也返回0
 
-In some scenarios, when running `rake rspec` or even rspec directly, the command
-returns 0 even though the build failed. This is commonly due to some RubyGem
-overwriting the `at_exit` handler of another RubyGem, in this case RSpec's.
+在某些情况下，在运行`rake rspec`或者甚至直接运行rspec时，即使构建失败，命令也返回0。这通常是由于一些RubyGem覆盖了另一个RubyGem的`at_exit`处理程序，在这里是RSpec的。
 
-The workaround is to install this `at_exit` handler in your code, as pointed out
-in [this article](http://www.davekonopka.com/2013/rspec-exit-code.html).
+临时修复方案是在你的代码里安装`at_exit`处理程序，像[这篇文章](http://www.davekonopka.com/2013/rspec-exit-code.html)指出的那样。
 
     if defined?(RUBY_ENGINE) && RUBY_ENGINE == "ruby" && RUBY_VERSION >= "1.9"
       module Kernel
@@ -78,44 +57,31 @@ in [this article](http://www.davekonopka.com/2013/rspec-exit-code.html).
       end
     end
 
-If your project is using the [Code Climate integration](/user/code-climate/) or
-Simplecov, this issue can also come up with the 0.8 branch of Simplecov. The fix
-is downgrade to the last 0.7 release until the issue is fixed.
+如果你的项目使用[Code Climate integration](/user/code-climate/)或者Simplecov，这个问题在Simplecov的0.8分支出现。修复方法是降级到最近的0.7发布，直到修复了这个问题。
 
-## Capybara: I'm getting errors about elements not being found
+## Capybara：我遇到了关于元素未找到的错误
 
-In scenarios that involve JavaScript, you can occasionally see errors that
-indicate that an element is missing, a button, a link, or some other resource
-that is updated or created by asynchronous JavaScript.
+在涉及JavaScript的情况下，你可能偶然发现指出一个元素缺失的错误，一个按钮，链接或者一些其他由异步JavaScript更新或者创建的资源。
 
-This can indicate that the timeouts used for Selenium or one of its drivers are
-set too low.
+这可以看出Selenium或者其某个驱动的超时设置太低。
 
-Capybara has a timeout setting which you can increase to a minimum of 15
-seconds:
+Capybara的超时设置你可以增加到至少15秒：
 
     Capybara.default_wait_time = 15
 
-Poltergeist has its own setting for timeouts:
+Poltergeist有它自己的超时设置：
 
     Capybara.register_driver :poltergeist do |app|
       Capybara::Poltergeist::Driver.new(app, timeout: 15)
     end
 
-If you're still seeing timeouts after increasing it initially, set it to
-something much higher for one test run. Should the error still persist, there's
-possibly a deeper issue on the page, for instance compiling the assets.
+如果你在最初增加了它之后依然遇到超时，那么将一次测试运行设置为高很多的值。如果错误依然存在，那么可能在页面内有更深层次的问题，例如编译资源。
 
-## Ruby: Installing the debugger_ruby-core-source library fails
+## Ruby：安装debugger_ruby-core-source library失败
 
-This Ruby library unfortunately has a history of breaking with even patchlevel
-releases of Ruby. It's commonly a dependency of libraries like linecache or
-other Ruby debugging libraries.
+不幸的是Ruby库有着甚至因为补丁级别的发布而导致中断的历史。这一般是由于依赖的库，比如linecache活着其他Ruby调试库。
 
-We recommend moving these libraries to a separate group in your Gemfile and then
-to install RubyGems on Travis CI without this group. As these libraries are only
-useful for local development, you'll even gain a speedup during the installation
-process of your build.
+我们建议将这些库移动到你的Gemfile中独立的组中，然后再Travis安装非这些组的RubyGems。由于这些库只对本地开发有用，在你构建的安装进程中你甚至会得到加速。
 
     # Gemfile
     group :debug do
@@ -127,7 +93,7 @@ process of your build.
     # .travis.yml
     bundler_args: --without development debug
 
-## Mac: Code Signing Errors
+## Mac：签名错误
 
 With Mavericks, quite a lot has changed in terms of code signing and the keychain application.
 
