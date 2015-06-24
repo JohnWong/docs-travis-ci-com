@@ -1,61 +1,46 @@
 ---
-title: Travis CI's use of GitHub API Scopes
+title: Travis CI的GitHub API使用范围
 layout: en
 permalink: /user/github-oauth-scopes/
 ---
-When you sign in on Travis CI, we ask for a few permissions to access your data.
+当你登录到Travis CI，我们请求一些权限来访问你的数据。
 
-This page provides an overview of which we ask for and why.
+本页提供了我们请求以及原因的概述。
 
-### Travis CI for Open Source
+### 开源项目使用Travis CI
 
-On <https://travis-ci.org> we currently ask for the following permissions.
+我们目前在<https://travis-ci.org>请求如下权限。
 
-Note that for open source projects, we don't have any write access to your
-source code or your profile.
+注意，对于开源项目，我们并没有任何对你的源代码或者资料的写权限。
 
-Make sure to check with [GitHub API's documentation](/user/github-oauth-scopes/)
-for additional details on the scopes we use.
+确保检查[GitHub API的文档](/user/github-oauth-scopes/)来了解我们使用的范围的额外详情。
 
 * `user:email`
 
-    We synchronize your email addresses for the purpose of emailing you build
-    notifications. They're currently not being used for any other means.
+    我们同步你的电子邮件地址用来给你发送构建提醒。目前并不会有任何其他用途。
 
-    We ask for this permission, because without it, we may have no means of
-    sending you the build notifications. Your email address can be hidden from
-    the GitHub profile, which in turns hides it from us as well.
+    我们请求这一权限是因为没有它，我们可能没有办法发送构建提醒给你。你的电子邮件地址可能从GitHub资料中隐藏，这样会对我们隐藏。
 
 * `read:org`
 
-    When you're logged in on Travis CI, we show you all of your repositories,
-    including the ones from any organization you're part of.
+    当你登录了Travis CI时，我们展示了你所有的库，包括那些你所在的组织里的库。
 
-    The GitHub API hides any organizations you're a private member of without
-    this scope. So to make sure we show you all of your repositories, we require
-    this scope.
+    没有这个范围，GitHub API将会隐藏所有你是私有成员的组织。因此要确保我们展示你所有的库给你，我们需要这个范围。
 
-    Note that this scope allows access to the basic information on both private
-    and public repositories, but not on any of the data and code stored in them.
+    注意这个范围允许访问私有和公共库的基本信息，但是并不访问任何存储在其中的数据与代码。
 
 * `repo_deployment`
 
-    Gives us access to the [upcoming deployments
-    API](http://developer.github.com/v3/repos/deployments/), currently in preview mode.
+    给我们访问[即将到来的部署API](http://developer.github.com/v3/repos/deployments/)，目前使用预览模式。
 
-    This scope currently isn't actively used, but will be in the future.
+    这个范围目前使用并不被活跃，但是将来将会。
 
 * `repo:status`
 
-    After every build, we update the status of its commit, which is most
-    relevant for testing pull request. This scope gives us the permission to
-    update the commit status as the build starts and finishes.
+    在每次构建后，我们更新其提交的状态，这与测试pull request最相关。这一范围给我们在构建开始与结束时更新提交状态的权限。
 
 * `write:repo_hook`
 
-    Building a new repository on Travis CI is as easy as enabling it in your
-    profile and pushing a new commit.
+    在Travis CI上构建一个新的库非常容易，在你的资料中启用它并推送一个新提交。
 
-    Updating the webhook required for us to be notified from GitHub on new
-    commits or pull requests requires this API scope. Additionally, your user
-    needs to have admin access to the repository you want to enable.
+    我们需要这个API范围，从而可以在GitHub新提交或者pull request的时候能够通知更新我们需要的webhook。此外你的账号需要有你希望启用的库的管理权限。
