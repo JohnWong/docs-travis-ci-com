@@ -12,47 +12,42 @@ Travis CI可以通过邮件、IRC或者webhook来通知你构建结果。
 
 如果提交者或者提交的作者是库的成员（也就是他们有公共库的推送或者管理权限，或者有私有库的拉取、推送或者管理权限），那么默认会发送邮件通知给他们。
 
+并且在给定的分支上在下面的情况下默认发送邮件：
 
+* 一个构建刚刚中断或者仍然中断
+* 一个之前中断的构建刚修复
 
-And it will by default send emails when, on the given branch:
+你可以使用下面的选项来改变这一行为：
 
-* a build was just broken or still is broken
-* a previously broken build was just fixed
+> 注意：括号中的条目是占位符。括号应该省略。
 
-You can change this behaviour using the following options:
+### 注意SSL/TLS Ciphers
 
-> Note: Items in brackets are placeholders. Brackets should be omitted.
+当通过SSL/TLS发送通知时，注意接收服务器所接受的cipher。如果服务器没有一个cipher生效，那么通知将会失败。
 
-### Note on SSL/TLS Ciphers
-
-When posting notifications over SSL/TLS, be mindful of what ciphers are accepted
-by the receiving server.
-Notifications will fail if none of the server's ciphers work.
-
-Currently, the following ciphers (as defined by the [jruby-openssl gem](https://rubygems.org/gems/jruby-openssl))
-are known to work:
+目前下列cipher（在[jruby-openssl gem](https://rubygems.org/gems/jruby-openssl)中定义的）已知会奏效：
 
 AES-128 AES-128-CBC AES-128-CFB AES-128-CFB1 AES-128-CFB8 AES-128-ECB AES-128-OFB AES-192 AES-192-CBC AES-192-CFB AES-192-CFB1 AES-192-CFB8 AES-192-ECB AES-192-OFB AES-256 AES-256-CBC AES-256-CFB AES-256-CFB1 AES-256-CFB8 AES-256-ECB AES-256-OFB BF BF-CBC BF-CFB BF-CFB1 BF-CFB8 BF-ECB BF-OFB BLOWFISH CAST CAST-CBC CAST5 CAST5-CBC CAST5-CFB CAST5-CFB1 CAST5-CFB8 CAST5-ECB CAST5-OFB DES DES-CBC DES-CFB DES-CFB1 DES-CFB8 DES-ECB DES-EDE DES-EDE-CBC DES-EDE-CFB DES-EDE-CFB1 DES-EDE-CFB8 DES-EDE-ECB DES-EDE-OFB DES-EDE3 DES-EDE3-CBC DES-EDE3-CFB DES-EDE3-CFB1 DES-EDE3-CFB8 DES-EDE3-ECB DES-EDE3-OFB DES-OFB RC2 RC2-40-CBC RC2-64-CBC RC2-CBC RC2-CFB RC2-CFB1 RC2-CFB8 RC2-ECB RC2-OFB RC4 RC4-40
 
-Also, consult [cipher suite names mapping](https://www.openssl.org/docs/apps/ciphers.html).
+也请查阅[cipher套件名称映射](https://www.openssl.org/docs/apps/ciphers.html)。
 
-If none of the ciphers listed above works, please open a [GitHub issue](https://github.com/travis-ci/travis-ci/issues).
+如果上面列出的cipher没有一个生效，请打开一个[GitHub issue](https://github.com/travis-ci/travis-ci/issues)。
 
-## Email notifications
+## 电子邮件通知
 
-You can specify recipients that will be notified about build results like so:
+你可以指定会收到构建结果通知的收件人，例如：
 
     notifications:
       email:
         - one@example.com
         - other@example.com
 
-And you can entirely turn off email notifications:
+你可以完全关掉电子邮件通知：
 
     notifications:
       email: false
 
-Also, you can specify when you want to get notified:
+你也可以指定你什么时候希望收到通知：
 
     notifications:
       email:
@@ -62,15 +57,13 @@ Also, you can specify when you want to get notified:
         on_success: [always|never|change] # default: change
         on_failure: [always|never|change] # default: always
 
-`always` and `never` mean that you want email notifications to be sent always or never. `change` means that you will get them when the build status changes on the given branch.
+`always`与`never`意味着你希望电子邮件通知总是或者从不发送。`change`意味着在给定分支的构建状态变更时你将会知道。
 
-### How is the build email receiver determined?
+### 如何确定构建电子邮件接收者？
 
-By default, a build email is sent to the committer and the author, but only if
-they have access to the repository the commit was pushed to. This prevents forks
-active on Travis CI from notifying the upstream repository's owners when they're
-pushing any upstream changes to their fork. It also prevents build notifications
-from going to folks not registered on Travis CI.
+构建电子邮件默认会发送给提交者或者作者，但是只有在他们可以访问提交推送到的库时才成立。这会阻止Travis CI上fork活动在他们推送任何upstream变更到他们的fork上时提醒upstream库的作者。这也阻止构建通知不会发到没有在Travis CI上注册的fork上。
+
+
 
 The email address is then determined based on the email address in the commit,
 but only if it matches one of the email addresses in our database. We
