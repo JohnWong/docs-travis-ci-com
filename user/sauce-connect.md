@@ -1,10 +1,11 @@
 ---
-title: Using Sauce Labs with Travis CI
+title: 在Travis CI中使用Sauce Labs
 layout: en
 permalink: /user/sauce-connect/
 ---
-Travis CI integrates with [Sauce Labs](https://saucelabs.com), a browser and
-mobile testing platform. It integrates well with Selenium, for instance.
+Travis CI集成了[Sauce Labs](https://saucelabs.com)，一个浏览器与移动测试平台。例如它很好地集成了Selenium。
+
+
 
 The integration automatically sets up a tunnel required to get started testing
 with it. For that purpose, it uses Sauce Connect.
