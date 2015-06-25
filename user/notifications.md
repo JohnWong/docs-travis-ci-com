@@ -63,53 +63,37 @@ AES-128 AES-128-CBC AES-128-CFB AES-128-CFB1 AES-128-CFB8 AES-128-ECB AES-128-OF
 
 构建电子邮件默认会发送给提交者或者作者，但是只有在他们可以访问提交推送到的库时才成立。这会阻止Travis CI上fork活动在他们推送任何upstream变更到他们的fork上时提醒upstream库的作者。这也阻止构建通知不会发到没有在Travis CI上注册的fork上。
 
+电子邮件地址通过提交中的电子邮件地址来确定，但是只有它匹配我们数据库中的电子邮件之一。我们从GitHub同步你所有的电子邮件地址，只是为了构建通知。
 
+默认值可以如上所示在`.travis.yml`中覆盖。如果指定了一个设置，那么Travis CI只给指定的地址发送电子邮件，而不会发给提交者或者作者。
 
-The email address is then determined based on the email address in the commit,
-but only if it matches one of the email addresses in our database. We
-synchronize all your email addresses from GitHub, solely for the purpose of
-build notifications.
+### 我们如何为构建通知修改电子邮件地址？
 
-The default can be overridden in the `.travis.yml` as shown above. If there's a
-setting specified, Travis CI only sends an emails to the addresses specified
-there, rather than to the committer and author.
+电子邮件地址由GitHub拉取。你的用户账号的所有注册的电子邮件在Travis CI中也都可用。
 
-### How can I change the email address for build notifications?
+你可以通过为指定的库设置一个不同的电子邮件地址来修改构建电子邮件地址。运行`git config user.email my@email.com`来为你的库设置一个不同的电子邮件地址而不是使用默认值。
 
-The email addresses are pulled from GitHub. All emails registered there for your
-user account are available in Travis CI as well.
+注意我们目前并不遵守GitHub的[详细通知设置](https://github.com/settings/notifications)，因为目前它们并没有通过一个API暴露出来。
 
-You can change the build email address by setting a different email address for
-a specific repository. Running `git config user.email my@email.com` sets a
-different email address than the default for your repository.
+### 我并未收到任何构建通知
 
-Note that we currently don't respect the [detailed notifications
-settings](https://github.com/settings/notifications) on
-GitHub, as they're not exposed via an API at this point.
+没有收到构建通知的最常见的原因，除了在Travis CI上有一个用户账户外，就是电子邮件地址并没有在GitHub上注册并验证。参考上面的如何修改电子邮件地址来修改为已注册的或者确保添加在这个库所使用的地址到GitHub上[你的已验证电子邮件地址](https://github.com/settings/emails)。
 
-### I'm not receiving any build notifications
+## IRC通知
 
-The most common cause for not receiving build notifications, beyond not having a
-user account on Travis CI, is the use of an email address that's not registered
-and verified on GitHub. See above on how to change the email address to one
-that's registered or make sure to add the email address used in this repository
-to [your verified email addresses](https://github.com/settings/emails) on GitHub.
-
-## IRC notification
-
-You can also specify notifications sent to an IRC channel:
+你也可以指定发送通知到一个IRC通道：fy notifications sent to an IRC channel:
 
     notifications:
       irc: "chat.freenode.net#my-channel"
 
-Or multiple channels:
+或者多个通道：
 
     notifications:
       irc:
         - "chat.freenode.net#my-channel"
         - "chat.freenode.net#some-other-channel"
 
-As with other notification types you can specify when IRC notifications will be sent:
+你也可以通过其它通知类型来指定什么时候会发送IRC通知：
 
     notifications:
       irc:
@@ -119,7 +103,7 @@ As with other notification types you can specify when IRC notifications will be 
         on_success: [always|never|change] # default: always
         on_failure: [always|never|change] # default: always
 
-You also have the possibility to customize the message that will be sent to the channel(s) with a template:
+你也可以通过一个模版来定制将会发送到通道的消息：
 
     notifications:
       irc:
@@ -130,7 +114,7 @@ You also have the possibility to customize the message that will be sent to the 
           - "%{repository} (%{commit}) : %{message} %{foo} "
           - "Build details: %{build_url}"
 
-You can interpolate the following variables:
+你也可以插入如下变量：
 
 * *repository_slug*: your GitHub repo identifier (like ```svenfuchs/minimal```)
 * *repository_name*: the slug without the username
@@ -147,7 +131,7 @@ You can interpolate the following variables:
 * *compare_url*: commit change view URL
 * *build_url*: URL of the build detail
 
-The default template is:
+默认模版是：
 
     notifications:
       irc:
@@ -156,7 +140,7 @@ The default template is:
           - "Change view : %{compare_url}"
           - "Build details : %{build_url}"
 
-If you want the bot to use notices instead of regular messages the `use_notice` flag can be used:
+如果你希望机器人使用提醒而非常规消息，可以使用`use_notice`标识：
 
     notifications:
       irc:
@@ -167,7 +151,7 @@ If you want the bot to use notices instead of regular messages the `use_notice` 
         on_failure: [always|never|change] # default: always
         use_notice: true
 
-and if you want the bot to not join before the messages are sent, and part afterwards, use the `skip_join` flag:
+如果你希望机器人在发送消息前不加入，稍后才加入。使用`skip_join`标识：
 
     notifications:
       irc:
@@ -179,9 +163,9 @@ and if you want the bot to not join before the messages are sent, and part after
         use_notice: true
         skip_join: true
 
-If you enable `skip_join`, remember to remove the `NO_EXTERNAL_MSGS` flag (n) on the IRC channel(s) the bot notifies.
+如果你启用`skip_join`，记得移除IRC通道的机器人提醒的`NO_EXTERNAL_MSGS`标识。
 
-If you want the bot to send messages to channels protected with a channel key (ie, set with `/mode #channel +k password`), you can use the `channel_key` variable:
+如果你希望机器人发送通道密钥保护的消息到通道（例如设置`/mode #channel +k password`），你可以使用`channel_key`变量：
 
     notifications:
       irc:
@@ -189,23 +173,23 @@ If you want the bot to send messages to channels protected with a channel key (i
           - "irc.freenode.org#my-channel"
         channel_key: 'password'
 
-## Campfire notification
+## Campfire通知
 
-Notifications can also be sent to Campfire chat rooms, using the following format:
+通知也可以通过Campfire的聊天室发送，使用如下格式：
 
     notifications:
       campfire: [subdomain]:[api token]@[room id]
 
 
-* *subdomain*: is your campfire subdomain (i.e. 'your-subdomain' if you visit 'https://your-subdomain.campfirenow.com')
-* *api token*: is the token of the user you want to use to post the notifications.
-* *room id*: this is the room id, not the name.
+* *子域*：是你的campfire子域（例如访问'https://your-subdomain.campfirenow.com'时是'your-subdomain'）
+* *api token*：你希望用来发送通知的账号的token。
+* *room id*：是房间id，而不是名称。
 
-> Note: We highly recommend you [encrypt](/user/encryption-keys/) this value if your .travis.yml is stored in a public repository:
+> 注意：如果你的.travis.yml存储在公共库中，我们强烈推荐你[加密](/user/encryption-keys/)这个值：
 
     travis encrypt subdomain:api_token@room_id --add notifications.campfire.rooms
 
-You can also customise the notifications, like with IRC notifications:
+你也可以定制通知，比如IRC通知：
 
     notifications:
       campfire:
@@ -215,45 +199,44 @@ You can also customise the notifications, like with IRC notifications:
           - "%{repository} (%{commit}) : %{message} %{foo} "
           - "Build details: %{build_url}"
 
-Other flags, like `on_success` and `on_failure` also work like the IRC notification config.
+其它标识，比如`on_success`与`on_failure`像在IRC通知配置中一样有效。
 
-## Flowdock notification
+## Flowdock通知
 
-Notifications can be sent to your Flowdock Team Inbox using the following format:
+通知可以通过使用如下格式发送到你的Flowdock Team Inbox收件箱：
 
     notifications:
       flowdock: [api token]
 
+* *api token*：是你希望通知的Team Inbox的API Token。你可以通过逗号分割的字符串或者数组来传递多个token。
 
-* *api token*: is your API Token for the Team Inbox you wish to notify. You may pass multiple tokens as a comma separated string or an array.
-
-> Note: We highly recommend you [encrypt](/user/encryption-keys/) this value if your .travis.yml is stored in a public repository:
+> 注意：如果你的.travis.yml存储在公共库中，我们强烈推荐你[加密](/user/encryption-keys/)这个值：
 
     travis encrypt api_token --add notifications.flowdock
 
-## HipChat notification
+## HipChat通知
 
-Notifications can be sent to your HipChat chat rooms using the following format:
+可以通过如下格式将通知发送到你的HipChat聊天室：
 
     notifications:
       hipchat: [api token]@[room id or name]
 
-If you are running HipChat Server, then you can specify the hostname like this:
+如果你在运行HipChat服务器，那么你可以像这样指定主机名：
 
     notifications:
       hipchat: [api token]@[hostname]/[room id or name]
 
-* *api token*: token of the user you want to use to post the notifications. This token can be either an API v1 token your group administrator gives you, or an API v2 token you manage.
-* *hostname*: optional, defaults to api.hipchat.com, but can be specified for HipChat Server instances
-* *room id or name*: id or name of the room you want to notify.
+* *api token*：你希望用来发送通知的账号的token。这个token可以使你的组管理员给你的API v1 token或者你管理的一个API v2 token。
+* *主机名*：可选的，默认是api.hipchat.com，但是可以为HipChat服务器实例指定。
+* *room id或者名称*：你希望提醒的房间的id或者名称。
 
-If your room name contains spaces then use the room id.
+如果你的房间名包含了空格，那么使用房间id。
 
-> Note: We highly recommend you [encrypt](/user/encryption-keys/) this value if your .travis.yml is stored in a public repository:
+> 注意：如果你的.travis.yml存储在公共库中，我们强烈推荐你[加密](/user/encryption-keys/)这个值：
 
     travis encrypt api_token@room_id_or_name --add notifications.hipchat.rooms
 
-HipChat notifications support templates too, so you can customize the appearance of the notifications, e.g. reduce it to a single line:
+HipChat通知也支持模版，因此你可以定制通知的外观，例如减少到只有一行：
 
     notifications:
       hipchat:
@@ -262,8 +245,7 @@ HipChat notifications support templates too, so you can customize the appearance
         template:
           - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
 
-If you want to send HTML notifications you need to add `format: html` like this
-(note that this disables some features like @mentions and autolinking):
+如果你希望发送HTML通知，你需要像这样添加`format: html`（注意这会关闭一些特性比如@提及与自动链接）：
 
     notifications:
       hipchat:
@@ -273,7 +255,7 @@ If you want to send HTML notifications you need to add `format: html` like this
           - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message} (<a href="%{build_url}">Details</a>/<a href="%{compare_url}">Change view</a>)'
         format: html
 
-With the V2 API, you can trigger a user notification by setting `notify: true`:
+使用V2 API，你可以通过设置`notify: true`来触发一个用户通知：
 
     notifications:
       hipchat:
@@ -283,41 +265,32 @@ With the V2 API, you can trigger a user notification by setting `notify: true`:
           - '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
         notify: true
 
-### `From` value in notifications
+### 通知中的`From`值
 
-When a V1 token is used, the notification is posted by "Travis CI".
+当使用一个V1 token，通知由"Travis CI"发送。
 
-With a V2 token, this value is set by the token's Label.
-Create a special-purpose room notification token ("Tokens" under the room's "Administration" section)
-with a desired label, and use this token.
+使用一个V2 token，这个值由token的Label设置。创建一个特定目的带有期望的标签的房间的通知token（在房间的管理部分的"Tokens"），并且使用这个token。
 
 <figure>
-  <img src="/images/hipchat_token_screen.png" alt="HipChat Room Notification Tokens screenshot" width="550px" />
+  <img src="{{ "/images/hipchat_token_screen.png" | prepend: site.baseurl }}" alt="HipChat Room Notification Tokens screenshot" width="550px" />
 </figure>
 
-## Sqwiggle notifications
+## Sqwiggle通知
 
-With [Sqwiggle](https://www.sqwiggle.com), you can combine Travis CI build
-notifications with the joys of seeing your team mates faces when they break or
-fix the build.
+有了[Sqwiggle](https://www.sqwiggle.com)，你可以将Travis CI构建通知与当构建中断或者修复时看到你的队友的脸的乐趣结合起来。
 
-To get started, you need to create an [API token for the Sqwiggle
-API](https://www.sqwiggle.com/company/clients). It's sufficient to create a
-stream client only, as that will have the least permissions.
+要开始，你需要创建一个[Sqwiggle API的API token](https://www.sqwiggle.com/company/clients)。它足够只创建一个流式客户端，因为它有最少的权限。
 
-Next you need to figure out with rooms to send the notifications to.
+接下来你需要发送通知的房间。
 
-You can use the room's name in the URL or you can use the room's identifier,
-which can currently be [fetched from the
-API](https://www.sqwiggle.com/docs/endpoints/rooms#listallrooms).
+你可以在URL中使用房间的名称或者使用房间的id，这个当前可以通过[从API获取](https://www.sqwiggle.com/docs/endpoints/rooms#listallrooms)。
 
-Now you can add the details to your .travis.yml:
+现在你可以添加详情到你的.travis.yml：
 
     notifications:
       sqwiggle: <api_token>@room
 
-If you'd like to notify multiple rooms, you can specify a list of token/room
-combinations.
+如果你希望通知多个房间，你可以给出一个token/房间组合的列表。
 
     notifications:
       sqwiggle:
@@ -325,57 +298,48 @@ combinations.
           - <api_token>@mainhall
           - <api_token>@developers
 
-Sqwiggle notifications support templating, so you can customize how the message
-pops up in your streams.
+Sqwiggle通知支持模版，因此你可以定制在你的流中消息 如何弹出。
 
-The default looks like this:
+默认值看起来是这样：
 
 ![](http://s3itch.paperplanes.de/sqwiggle_20140212_101412.jpg_20140213_103612.jpg)
 
-To customize it, add a template definition to your .travis.yml.
+要定制它，添加一个模版定义到你的.travis.yml。
 
     notifications:
       sqwiggle:
         rooms: <api_token>@mainhall
         template: '%{repository}#%{build_number} (%{branch} - %{commit} : %{author}): %{message}'
 
-It's recommended to encrypt the credentials.
+加密认证信息是推荐的。
 
-## Slack notifications
+## Slack通知
 
-Travis CI supports notifying arbitrary [Slack](http://slack.com) channels about
-build results.
+Travis CI支持将构建结果通知给任意的[Slack](http://slack.com)通道。
 
-On Slack, set up a [new Travis CI
-integration](https://my.slack.com/services/new/travis). Select a channel,
-and you'll find the details to paste into your .travis.yml.
+在Slack，建立一个[新的Travis CI集成](https://my.slack.com/services/new/travis)。选择一个通道，你将会找到要粘贴到你的.travis.yml中的详情。
 
 <figure>
   <img src="http://s3itch.paperplanes.de/slackintegration_20140313_075147.jpg"/>
 </figure>
 
-The channel name in the Slack settings can be overridden in Travis CI's
-notification settings, so you can set up one integration and use it for multiple
-channels regardless of the initial setup.
+在Slack设置中的通道名称可以被Travis CI的通知设置覆盖，因此你可以建立一个集成并在多个通道中使用，而不必理会初始设置。
 
-Just copy and paste the settings, which already include the proper token, into
-your `.travis.yml`, and you're good to go.
+只需要复制粘贴已经包含了合适token的设置到你的`.travis.yml`，那么你就可以开始了。
 
-Easy as pie, but if you want more customization, read on.
+就像做派一样简单，但是如果你希望更多定制，那么继续阅读。
 
-The simplest configuration requires your account name and the token you just
-generated.
+最简单的配置需要你的账号名称与你刚创建的token。
 
     notifications:
       slack: '<account>:<token>'
 
-Overriding the channel is also possible, just add it to the configuration with a
-`#` separating them from account and token.
+覆盖通道也是可能的，只需要用一个`#`隔开账户与token，添加到配置中。
 
     notifications:
       slack: '<account>:<token>#development'
 
-You can specify multiple channels as well.
+你也可以指定多个通道。
 
     notifications:
       slack:
@@ -383,37 +347,33 @@ You can specify multiple channels as well.
           - <account>:<token>#development
           - <account>:<token>#general
 
-
-As always, it's recommended to encrypt the credentials with our
-[travis](https://github.com/travis-ci/travis#readme) command line client.
+一如既往，我们推荐用我们的[travis](https://github.com/travis-ci/travis#readme)命令行客户端加密认证信息。
 
     travis encrypt "<account>:<token>" --add notifications.slack
 
-Once everything's setup, push a new commit and you should see something like the
-screenshot below:
+一旦所有东西都设置好了，推送一个新的提交，你将会看到一些东西，就像下面的屏幕快照：
 
 <figure>
   <img src="http://s3itch.paperplanes.de/slackmessage_20140313_180150.jpg">
 </figure>
 
-Slack will be notified both for normal branch builds and for pull requests as
-well.
+Slack将会提醒普通分支构建与pull request。
 
-## Webhook notification
+## Webhook通知
 
-You can define webhooks to be notified about build results the same way:
+你可以用同样的方式定义将构建结果通知给webhook：
 
     notifications:
       webhooks: http://your-domain.com/notifications
 
-Or multiple URLs:
+或者多个URL：
 
     notifications:
       webhooks:
         - http://your-domain.com/notifications
         - http://another-domain.com/notifications
 
-As with other notification types you can specify when webhook payloads will be sent:
+就像webhook负载发送时你可以指定的其他通知类型一样：
 
     notifications:
       webhooks:
@@ -424,31 +384,31 @@ As with other notification types you can specify when webhook payloads will be s
         on_failure: [always|never|change] # default: always
         on_start: [always|never|change] # default: always
 
-### Webhooks Delivery Format
+### Webhooks交付格式
 
-Webhooks are delivered with a `application/x-www-form-urlencoded` content type using HTTP POST, with the body including a `payload` parameter that contains the JSON webhook payload in a URL-encoded format.
+使用HTTP POST来交付webhook， 内容类型是`application/x-www-form-urlencoded`，body包括了一个包含URL编码格式的JSON webhook负载的`payload`参数。
 
-Here's an example of what you'll find in the `payload`:
+这里是一个你可以在`payload`中找到的例子：
 
 <script src="https://gist.github.com/roidrage/9272064.js"></script>
 
-You will see one of the following values in the `status`/`result` fields that represent the state of the build.
+你可以在`status`/`result`字段中看到下面代表构建状态的值中的一个。
 
-* *0*: Represents a build that has completed successfully
-* *1*: Represents a build that has not yet completed or has completed and failed
+* *0*：代表一个完全成功的构建
+* *1*：代表一个构建并未完成或者完成并失败
 
-Additionally a message will be present in the `status_message`/`result_message` fields that further describe the status of the build.
+此外一个消息将出现在`status_message`/`result_message`字段来进一步描述构建的状态。
 
-* *Pending*: A build has been requested
-* *Passed*: The build completed successfully
-* *Fixed*: The build completed successfully after a previously failed build
-* *Broken*: The build completed in failure after a previously successful build
-* *Failed*: The build is the first build for a new branch and has failed
-* *Still Failing*: The build completed in failure after a previously failed build
+* *Pending*：一个构建已经请求
+* *Passed*：构建完全成功
+* *Fixed*：在之前一次失败的构建后，构建完全成功
+* *Broken*：在之前构建成功后，构建完成但是失败
+* *Failed*: 构建是一个新分支的第一次构建，失败了
+* *Still Failing：在之前一次失败的构建后，构建完成但是失败
 
-For pull requests, the `type` field will have the value `pull_request`, and a `pull_request_number` field is included too, pointing to the pull request's issue number on GitHub.
+对于pull requests， `type`字段值会是`pull_request`，`pull_request_number`字段也会包含，来指出pull request在GitHub上的issue号码。
 
-Here's a simple example of a [Sinatra](http://sinatrarb.com) app to decode the request and the payload:
+这里有一个[Sinatra](http://sinatrarb.com)应用的例子，来解码请求与负载：
 
 	require 'sinatra'
 	require 'json'
@@ -480,28 +440,23 @@ Here's a simple example of a [Sinatra](http://sinatrarb.com) app to decode the r
 	  end
 	end
 
-To quickly identify the repository involved, we include a `Travis-Repo-Slug` header, with a format of `account/repository`, so for instance `travis-ci/travis-ci`.
+要快速识别出涉及的库，我们包含了一个`Travis-Repo-Slug`header，格式是`account/repository`，例如`travis-ci/travis-ci`。
 
-### Authorization for Webhooks
+### Webhook授权
 
-When Travis CI makes the POST request, a header named `Authorization` is included.
-Its value is the SHA2 hash of the GitHub username (see below), the name of the repository,
-and your Travis CI token.
+当Travis CI做POST请求时，包含了一个名为`Authorization`的header。其值是GitHub用户名的SHA2哈希值（如下），库名称与你的Travis CI token。
 
-For instance, in Python, use this snippet:
+例如，在Python中，使用这个代码片段：
 
     from hashlib import sha256
     sha256('username/repository' + TRAVIS_TOKEN).hexdigest()
 
-Use this to ensure Travis CI is the one making requests to your webhook.
+以此来确保发起到你的webhook请求的是Travis CI。
 
-The Travis CI token used to authenticate the webhooks is the user token, which you can find on your profile page.
+用来授权webhook的Travis CI token是用户的token，你可以在你的资料页找到。
 
-![](/images/token.jpg)
+![]({{ "/images/token.jpg" | prepend: site.baseurl }})
 
-It's the token for the user who originally set up the repository on Travis CI.
-If you're uncertain who that was, you can find the user's name on the service
-hooks page of your repository on GitHub.
+这是最初在Travis CI建立库的用户的token。如果你不确定是谁，那么你可以在GitHub上你的库的服务hook页找到。
 
-This process is going to be reworked in the future, as the user token isn't
-constantly reliable, but we'll announce any changes well in advance.
+这个进程将来会重写，因此用户token并不一直可靠，但是我们将会提前宣布任何改变。
