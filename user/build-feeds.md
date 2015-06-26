@@ -1,35 +1,26 @@
 ---
-title: Atom Build Feeds
+title: Atom构建Feeds
 layout: en
 permalink: /user/build-feeds/
 ---
-One of the means to get updates on builds are Atom feeds.
 
-You can read them in your favorite RSS reader, or programmatically consume them
-with scripts.
+得到构建更新的一种方式是Atom feeds。
+
+你可以在你喜爱的RSS阅读器中阅读它们，或者用脚本以编程方式利用它们。
 
 ### Atom Feeds
 
-Every repository on Travis CI has its own Atom feed, including all builds that
-were run on it, with both pull requests and normal commits.
+Travis CI上的每个库都有其自己的Atom feed，包含了运行在其中的所有构建，包括pull request与普通提交。
 
-The feeds are fetched directly from our [API](https://api.travis-ci.org). The
-canonical URL to fetch a repository's builds is
-`https://api.travis-ci.org/repos/travis-ci/travis-ci/builds`.  This returns a
-JSON representation by default, but you can get the Atom feed by adding the
-`.atom` suffix.
+feed直接从你的[API](https://api.travis-ci.org)获取。获取一个库的构建的典型URL是`https://api.travis-ci.org/repos/travis-ci/travis-ci/builds`。这默认返回用JSON表示，但是你可以通过添加`.atom`后缀来得到Atom feed。
 
-For the repository above, the URL would then be
-`https://api.travis-ci.org/repos/travis-ci/travis-ci/builds.atom`
+对于上面的库，URL将会是`https://api.travis-ci.org/repos/travis-ci/travis-ci/builds.atom`
 
-On Travis CI Pro, for private repositories, you'll need a token to subscribe to
-the feed. The [API endpoint](https://api.travis-ci.com) is different too.
+在Travis CI Pro中，对于私有库，你需要一个token来订阅源。The [API endpoint](https://api.travis-ci.com)也不同。
 
-The token must be appended to the URL as the `token` parameter. You can find the
-token in [your profile](https://magnum.travis-ci.com/profile/) under the
-"Profile" tab.
+token必须作为`token`参数附加到URL后。你可以在"Profile" tab下[你的资料](https://magnum.travis-ci.com/profile/)中找到token。
 
-![](/images/token.jpg)
+![]({{ "/images/token.jpg" | prepend: site.baseurl }})
 
-An example URL would be
+一个URL示例是
 `https://api.travis-ci.com/repos/travis-ci/billing/builds.atom?token=<token>`
